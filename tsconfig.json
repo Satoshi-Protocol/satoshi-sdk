@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".", // Set the base directory for resolving non-relative module names
+    "paths": {
+      "*": ["src/*"] // Adjust depending on your directory structure
+    },
+   "target": "es6",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./lib/",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

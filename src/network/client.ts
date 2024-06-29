@@ -9,7 +9,7 @@ export function getPublicClientByConfig(config: ProtocolConfig) {
   });
 }
 
-export function getWalletClientByConfig(config: ProtocolConfig, account?: Account) {
+export function getWalletClientByConfig(config: ProtocolConfig, account: Account) {
   return createWalletClient({
     account: account,
     chain: config.CHAIN,

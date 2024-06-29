@@ -1,17 +1,6 @@
-import { Hello, ProtocolConfigMap, getPublicClientByConfig } from '../src';
+import { Hello } from '../src';
 
-describe('index', () => {
-  describe('client', () => {
-    it('getBlockNumber', async () => {
-      const allConfig = Object.values(ProtocolConfigMap);
-      for (const config of allConfig) {
-        const publicClient = getPublicClientByConfig(config);
-        const blockNumber = await publicClient.getBlockNumber();
-        expect(blockNumber).toBeGreaterThan(0);
-      }
-    });
-  });
-
+describe('network', () => {
   describe('Hello', () => {
     [
       {

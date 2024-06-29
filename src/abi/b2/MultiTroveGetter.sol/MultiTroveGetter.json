@@ -1,0 +1,73 @@
+{
+  "abi": [
+    { "type": "constructor", "inputs": [], "stateMutability": "nonpayable" },
+    {
+      "type": "function",
+      "name": "getMultipleSortedTroves",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_startIdx", "type": "int256", "internalType": "int256" },
+        { "name": "_count", "type": "uint256", "internalType": "uint256" },
+        { "name": "price", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [
+        {
+          "name": "_troves",
+          "type": "tuple[]",
+          "internalType": "struct CombinedTroveData[]",
+          "components": [
+            { "name": "owner", "type": "address", "internalType": "address" },
+            { "name": "debt", "type": "uint256", "internalType": "uint256" },
+            { "name": "coll", "type": "uint256", "internalType": "uint256" },
+            { "name": "stake", "type": "uint256", "internalType": "uint256" },
+            {
+              "name": "snapshotCollateral",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "snapshotDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "nominalICR",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "currentICR",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "entireDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "entireColl",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "pendingDebtReward",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "pendingCollReward",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

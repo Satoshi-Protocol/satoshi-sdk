@@ -1,0 +1,230 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "_debtToken",
+          "type": "address",
+          "internalType": "contract IDebtToken"
+        },
+        {
+          "name": "_borrowerOperationsProxy",
+          "type": "address",
+          "internalType": "contract IBorrowerOperations"
+        },
+        {
+          "name": "_referralManager",
+          "type": "address",
+          "internalType": "contract IReferralManager"
+        },
+        { "name": "_weth", "type": "address", "internalType": "contract IWETH" }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    { "type": "receive", "stateMutability": "payable" },
+    {
+      "type": "function",
+      "name": "addColl",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_collAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "adjustTrove",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_collDeposit",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_collWithdrawal",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_debtChange", "type": "uint256", "internalType": "uint256" },
+        { "name": "_isDebtIncrease", "type": "bool", "internalType": "bool" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "borrowerOperationsProxy",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IBorrowerOperations"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "closeTrove",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "debtToken",
+      "inputs": [],
+      "outputs": [
+        { "name": "", "type": "address", "internalType": "contract IDebtToken" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "openTrove",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_collAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        { "name": "_referrer", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "referralManager",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IReferralManager"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "repayDebt",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "weth",
+      "inputs": [],
+      "outputs": [
+        { "name": "", "type": "address", "internalType": "contract IWETH" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "withdrawColl",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_collWithdrawal",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "withdrawDebt",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    { "type": "error", "name": "CannotWithdrawAndAddColl", "inputs": [] },
+    {
+      "type": "error",
+      "name": "InvalidMsgValue",
+      "inputs": [
+        { "name": "msgValue", "type": "uint256", "internalType": "uint256" }
+      ]
+    },
+    { "type": "error", "name": "InvalidZeroAddress", "inputs": [] },
+    {
+      "type": "error",
+      "name": "MsgValueMismatch",
+      "inputs": [
+        { "name": "msgValue", "type": "uint256", "internalType": "uint256" },
+        { "name": "collAmount", "type": "uint256", "internalType": "uint256" }
+      ]
+    },
+    { "type": "error", "name": "NativeTokenTransferFailed", "inputs": [] }
+  ]
+}

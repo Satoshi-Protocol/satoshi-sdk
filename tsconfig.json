@@ -1,17 +1,20 @@
 {
   "compilerOptions": {
-    "baseUrl": ".", // Set the base directory for resolving non-relative module names
+    "baseUrl": "./src",
     "paths": {
-      "*": ["src/*"] // Adjust depending on your directory structure
+      "*": ["src/*"],
+      "@/*": ["src/*"]
     },
-   "target": "es6",
+    "target": "ES2020",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./lib/",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules"]
 }

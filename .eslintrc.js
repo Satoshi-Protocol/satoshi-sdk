@@ -14,6 +14,15 @@ module.exports = {
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:prettier/recommended',
   ],
+  ignorePatterns: ['lib/', 'node_modules/', 'coverage/', 'jest.config.js', '.eslintrc.js'],
+  settings: {
+    'import/resolver': {
+      node: {
+        paths: ['src'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
+      }
+    }
+  },
   rules: {
     'prettier/prettier': 'warn',
     'node/no-missing-import': 'off',
@@ -87,5 +96,6 @@ module.exports = {
     "no-unused-vars": ["warn", { "vars": "all", "args": "none", "ignoreRestSiblings": false }],
     "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }],
     "no-duplicate-imports": ["error", { "includeExports": true }],
+    'object-curly-newline': 'off',
   },
 };

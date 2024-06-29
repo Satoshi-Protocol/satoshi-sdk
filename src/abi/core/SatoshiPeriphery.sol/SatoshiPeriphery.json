@@ -1,0 +1,545 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "_debtToken",
+          "type": "address",
+          "internalType": "contract IDebtToken"
+        },
+        {
+          "name": "_borrowerOperationsProxy",
+          "type": "address",
+          "internalType": "contract IBorrowerOperations"
+        },
+        { "name": "_weth", "type": "address", "internalType": "contract IWETH" }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    { "type": "receive", "stateMutability": "payable" },
+    {
+      "type": "function",
+      "name": "addColl",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_collAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "addCollWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_collAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "adjustTrove",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_collDeposit",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_collWithdrawal",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_debtChange", "type": "uint256", "internalType": "uint256" },
+        { "name": "_isDebtIncrease", "type": "bool", "internalType": "bool" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "adjustTroveWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_collDeposit",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_collWithdrawal",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_debtChange", "type": "uint256", "internalType": "uint256" },
+        { "name": "_isDebtIncrease", "type": "bool", "internalType": "bool" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "borrowerOperationsProxy",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IBorrowerOperations"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "closeTrove",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "closeTroveWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "debtToken",
+      "inputs": [],
+      "outputs": [
+        { "name": "", "type": "address", "internalType": "contract IDebtToken" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "liquidateTroves",
+      "inputs": [
+        {
+          "name": "liquidationManager",
+          "type": "address",
+          "internalType": "contract ILiquidationManager"
+        },
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "maxTrovesToLiquidate",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "maxICR", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "liquidateTrovesWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "liquidationManager",
+          "type": "address",
+          "internalType": "contract ILiquidationManager"
+        },
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "maxTrovesToLiquidate",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "maxICR", "type": "uint256", "internalType": "uint256" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "openTrove",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_collAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "openTroveWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_collAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "redeemCollateral",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        {
+          "name": "_firstRedemptionHint",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_upperPartialRedemptionHint",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_lowerPartialRedemptionHint",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_partialRedemptionHintNICR",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_maxIterations",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "redeemCollateralWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        {
+          "name": "_firstRedemptionHint",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_upperPartialRedemptionHint",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_lowerPartialRedemptionHint",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_partialRedemptionHintNICR",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_maxIterations",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "repayDebt",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "repayDebtWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "weth",
+      "inputs": [],
+      "outputs": [
+        { "name": "", "type": "address", "internalType": "contract IWETH" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "withdrawColl",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_collWithdrawal",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "withdrawCollWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_collWithdrawal",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "withdrawDebt",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "withdrawDebtWithPythPriceUpdate",
+      "inputs": [
+        {
+          "name": "troveManager",
+          "type": "address",
+          "internalType": "contract ITroveManager"
+        },
+        {
+          "name": "_maxFeePercentage",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "_debtAmount", "type": "uint256", "internalType": "uint256" },
+        { "name": "_upperHint", "type": "address", "internalType": "address" },
+        { "name": "_lowerHint", "type": "address", "internalType": "address" },
+        {
+          "name": "priceUpdateData",
+          "type": "bytes[]",
+          "internalType": "bytes[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    { "type": "error", "name": "CannotWithdrawAndAddColl", "inputs": [] },
+    {
+      "type": "error",
+      "name": "InsufficientMsgValue",
+      "inputs": [
+        { "name": "msgValue", "type": "uint256", "internalType": "uint256" },
+        {
+          "name": "requiredValue",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "InvalidMsgValue",
+      "inputs": [
+        { "name": "msgValue", "type": "uint256", "internalType": "uint256" }
+      ]
+    },
+    { "type": "error", "name": "InvalidZeroAddress", "inputs": [] },
+    {
+      "type": "error",
+      "name": "MsgValueMismatch",
+      "inputs": [
+        { "name": "msgValue", "type": "uint256", "internalType": "uint256" },
+        { "name": "collAmount", "type": "uint256", "internalType": "uint256" }
+      ]
+    },
+    { "type": "error", "name": "NativeTokenTransferFailed", "inputs": [] },
+    { "type": "error", "name": "RefundFailed", "inputs": [] }
+  ]
+}

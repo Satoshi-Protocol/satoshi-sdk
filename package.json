@@ -7,15 +7,15 @@
     "lib/**/*"
   ],
   "scripts": {
+    "lint": "eslint ./src/ --fix",
     "build": "tsc --project tsconfig.build.json",
+    "test": "jest --coverage",
+    "fork:bevm": "anvil --port 8545 --fork-url https://bevm.rpc-satoshiprotocol.org",
     "clean": "rm -rf ./lib/",
     "cm": "cz",
-    "lint": "eslint ./src/ --fix",
     "prepare": "husky install",
     "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
-    "ts-jest": "ts-jest config:migrate",
-    "test": "jest --coverage",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
@@ -56,6 +56,7 @@
     "@types/node": "^12.20.11",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
+    "concurrently": "^8.2.2",
     "conventional-changelog-conventionalcommits": "^5.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",

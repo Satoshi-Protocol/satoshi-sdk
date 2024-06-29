@@ -1,5 +1,3 @@
-// import 'module-alias/register';
-
 export * from './network';
 export * from './types';
 export * from './config';

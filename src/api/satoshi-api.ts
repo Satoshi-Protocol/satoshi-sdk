@@ -4,7 +4,6 @@ import { Address } from 'viem';
 import { SetReferrer, TroveHintRequestDto, WalletInDto } from './satoshi-api.type';
 import { SATO_API_URL } from '../config';
 
-//
 const axiosInstance = axios.create({
   baseURL: SATO_API_URL,
 });

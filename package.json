@@ -14,7 +14,8 @@
     "prepare": "husky install",
     "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
-    "test": "jest --coverage",
+    "ts-jest": "ts-jest config:migrate",
+    "test": "jest --require ts-node/register --coverage",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
@@ -46,6 +47,9 @@
   },
   "homepage": "https://github.com/Satoshi-Protocol/satoshi-sdk#readme",
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
     "@ryansonshine/commitizen": "^4.2.8",
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",
     "@types/jest": "^27.5.2",
@@ -122,7 +126,10 @@
     ]
   },
   "dependencies": {
+    "axios": "^1.7.2",
+    "bignumber.js": "^9.1.2",
     "i": "^0.3.7",
+    "module-alias": "^2.2.3",
     "npm": "^10.8.1",
     "viem": "^2.16.3"
   }

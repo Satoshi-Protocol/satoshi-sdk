@@ -1,11 +1,18 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
+      "abi": ["src/abi"],
+      "api": ["src/api"],
+      "config": ["src/config"],
+      "core": ["src/core"],
+      "network": ["src/network"],
+      "types": ["src/types"],
+      "@": ["src/index"],
       "*": ["src/*"],
       "@/*": ["src/*"]
     },
-    "target": "ES2020",
+    "target": "ESNext",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./lib/",
@@ -14,6 +21,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "allowJs": true 
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"]

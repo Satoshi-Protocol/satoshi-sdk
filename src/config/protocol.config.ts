@@ -4,6 +4,25 @@ import { bevm_mainnet, bitlayer_mainnet } from './chain.config';
 import { BEVM_ABI, BITLAYER_ABI } from '../abi';
 import { ChainNameEnum, ProtocolConfig } from '../types/config.type';
 
+export const SATO_API_URL = 'https://api.satoshiprotocol.org';
+
+export const DEBT_TOKEN_DECIMALS = 18;
+export const NICR_DECIMALS = 20;
+export const IS_TROVE_HINT_FROM_API_ENABLED = true;
+export const SP_APR_DAYS = 7;
+export const PRICE_DECIMALS = 18;
+export const BORROWING_FEE = 5; // 0.5%
+export const BORROWING_FEE_BASE = 1000;
+export const DEFAULT_MAX_FEE_PERCENTAGE = 0.05; // 5%
+export const DEFAULT_MAX_REDEMPTION_FEE_PERCENTAGE = 0.05; // 5%
+export const FEE_PERCENTAGE_DECIMALS = 18;
+export const TRIAL_NUMBER = 15;
+export const RANDOM_SEED = 42;
+export const CR_DECIMALS = 18;
+export const DECIMAL_PRECISION = 18;
+export const MAX_ITERATIONS = 50;
+export const OSHI_TOKEN_DECIMALS = 18;
+
 const BEVM_MAINNET: ProtocolConfig = {
   CHAIN: bevm_mainnet,
   ABI: BEVM_ABI,

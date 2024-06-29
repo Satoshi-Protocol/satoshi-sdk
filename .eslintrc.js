@@ -17,10 +17,11 @@ module.exports = {
   ignorePatterns: ['lib/', 'node_modules/', 'coverage/', 'jest.config.js', '.eslintrc.js'],
   settings: {
     'import/resolver': {
-      node: {
-        paths: ['src'],
-        extensions: ['.js', '.jsx', '.ts', '.tsx']
-      }
+      typescript: {},
+      // node: {
+      //   paths: ['src'],
+      //   extensions: ['.js', '.jsx', '.ts', '.tsx']
+      // }
     }
   },
   rules: {
@@ -97,5 +98,6 @@ module.exports = {
     "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }],
     "no-duplicate-imports": ["error", { "includeExports": true }],
     'object-curly-newline': 'off',
+    'indent': 'off',
   },
 };

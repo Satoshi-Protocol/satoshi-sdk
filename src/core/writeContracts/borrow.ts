@@ -1,8 +1,7 @@
 import { PublicClient, WalletClient, parseUnits } from 'viem';
 
-import { DEFAULT_MAX_FEE_PERCENTAGE, FEE_PERCENTAGE_DECIMALS } from 'config';
-import { CollateralConfig, ProtocolConfig } from 'types';
-
+import { DEFAULT_MAX_FEE_PERCENTAGE, FEE_PERCENTAGE_DECIMALS } from '../../config';
+import { CollateralConfig, ProtocolConfig } from '../../types';
 import { getHint } from '../utils/getHint';
 
 export const borrow = async ({

@@ -1,7 +1,6 @@
 import { PublicClient, WalletClient } from 'viem';
 
-import { CollateralConfig, ProtocolConfig } from 'types';
-
+import { CollateralConfig, ProtocolConfig } from '../../types';
 import { getHint } from '../utils/getHint';
 
 export const repay = async ({

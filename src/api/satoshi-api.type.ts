@@ -1,7 +1,7 @@
 // eslint-disable-next-line prettier/prettier
 import { type Address } from 'viem';
 
-import { ChainNameEnum } from 'types';
+import { ChainNameEnum } from '../types';
 
 export interface WalletInDto {
   address: string;

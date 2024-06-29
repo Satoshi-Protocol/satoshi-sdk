@@ -1,10 +1,9 @@
 import { PublicClient, getAddress, maxUint256 } from 'viem';
 
-import { getTroveHint } from 'api';
-import { IS_TROVE_HINT_FROM_API_ENABLED, RANDOM_SEED, TRIAL_NUMBER } from 'config';
-import { ProtocolConfig } from 'types';
-
 import { calcNICR } from './calculator';
+import { getTroveHint } from '../../api';
+import { IS_TROVE_HINT_FROM_API_ENABLED, RANDOM_SEED, TRIAL_NUMBER } from '../../config';
+import { ProtocolConfig } from '../../types';
 import { getApproxHint } from '../readContracts/getApproxHint';
 import { getInsertPosition } from '../readContracts/getInsertPosition';
 import { getNominalICR } from '../readContracts/getNominalICR';

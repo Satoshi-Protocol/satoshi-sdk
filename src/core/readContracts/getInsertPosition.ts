@@ -1,6 +1,6 @@
 import { PublicClient } from 'viem';
 
-import { ProtocolConfig } from '@/types';
+import { ProtocolConfig } from '../../types';
 
 export type findInsertPositionRes = [`0x${string}`, `0x${string}`];
 

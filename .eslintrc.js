@@ -13,11 +13,15 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:prettier/recommended',
+    'plugin:import/typescript',
   ],
   ignorePatterns: ['lib/', 'node_modules/', 'coverage/', 'jest.config.js', '.eslintrc.js'],
   settings: {
     'import/resolver': {
-      typescript: {},
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json',
+      },
       // node: {
       //   paths: ['src'],
       //   extensions: ['.js', '.jsx', '.ts', '.tsx']

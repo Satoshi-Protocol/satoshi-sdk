@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { parseUnits } from 'viem';
 
-import { DEBT_TOKEN_DECIMALS, NICR_DECIMALS } from '@/config';
+import { DEBT_TOKEN_DECIMALS, NICR_DECIMALS } from '../../config';
 
 export const calcTotalDebtAmt = (borrowingAmt: bigint, borrowingRateWithDecay: bigint, gasCompensationNum: number) => {
   const netDebtAmt = calcNetDebtAmt(borrowingAmt, borrowingRateWithDecay);

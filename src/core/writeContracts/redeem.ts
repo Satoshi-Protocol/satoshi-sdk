@@ -1,7 +1,7 @@
 import { PublicClient, WalletClient, parseUnits } from 'viem';
 
-import { DEFAULT_MAX_REDEMPTION_FEE_PERCENTAGE, FEE_PERCENTAGE_DECIMALS } from 'config';
-import { CollateralConfig, ProtocolConfig } from 'types';
+import { DEFAULT_MAX_REDEMPTION_FEE_PERCENTAGE, FEE_PERCENTAGE_DECIMALS } from '../../config';
+import { CollateralConfig, ProtocolConfig } from '../../types';
 
 export type RedemptionHintType = {
   redemptionHints: {

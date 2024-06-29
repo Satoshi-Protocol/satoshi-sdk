@@ -1,6 +1,6 @@
 import { Account, createPublicClient, createWalletClient, http } from 'viem';
 
-import { ProtocolConfig } from 'types';
+import { ProtocolConfig } from '../types';
 
 export function getPublicClientByConfig(config: ProtocolConfig) {
   return createPublicClient({

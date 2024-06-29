@@ -1,4 +1,0 @@
-export enum EApiQueryChain {
-  BEVM_MAINNET = 'BEVM_MAINNET',
-  BITLAYER_MAINNET = 'BITLAYER_MAINNET',
-}

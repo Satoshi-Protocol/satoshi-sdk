@@ -15,7 +15,7 @@
     "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
     "ts-jest": "ts-jest config:migrate",
-    "test": "jest --require ts-node/register --coverage",
+    "test": "jest --coverage",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
@@ -57,7 +57,7 @@
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
     "conventional-changelog-conventionalcommits": "^5.0.0",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",

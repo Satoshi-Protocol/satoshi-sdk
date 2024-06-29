@@ -1,6 +1,6 @@
 import { PublicClient, WalletClient } from 'viem';
 
-import { CollateralConfig, ProtocolConfig } from 'types';
+import { CollateralConfig, ProtocolConfig } from '../../types';
 
 export const claimCollateral = async ({
   publicClient,

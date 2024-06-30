@@ -4,7 +4,7 @@ import { ProtocolConfig, ProtocolConfigMap } from '../../src';
 
 export const mock_bevm_mainnet = defineChain({
   id: 11501,
-  name: 'BEVM Mainnet',
+  name: 'Mock BEVM Mainnet',
   nativeCurrency: {
     decimals: 18,
     name: 'Bitcoin',

@@ -10,7 +10,7 @@
     "lint": "eslint ./src/ --fix",
     "build": "tsc --project tsconfig.build.json",
     "test": "jest --coverage",
-    "fork:bevm": "anvil --port 8545 --fork-url https://bevm.rpc-satoshiprotocol.org",
+    "fork:bevm": "anvil --port 8545 --fork-url https://rpc-mainnet-1.bevm.io/",
     "clean": "rm -rf ./lib/",
     "cm": "cz",
     "prepare": "husky install",

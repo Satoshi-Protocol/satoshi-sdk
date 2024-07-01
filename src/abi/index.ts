@@ -53,6 +53,9 @@ import core_peripheryABI from './core/SatoshiPeriphery.sol/SatoshiPeriphery.json
 import core_sortedTrovesABI from './core/SortedTroves.sol/SortedTroves.json';
 import core_stabilityPoolABI from './core/StabilityPool.sol/StabilityPool.json';
 import core_troveManagerABI from './core/TroveManager.sol/TroveManager.json';
+import _wbtcABI from './wbtc.json';
+
+export const wbtcABI = _wbtcABI;
 
 export const BEVM_ABI = {
   BORROWER_OPERATIONS: bevm_borrowerOperationsABI.abi,

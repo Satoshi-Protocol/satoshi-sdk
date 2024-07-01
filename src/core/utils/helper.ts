@@ -1,3 +1,7 @@
+import { PublicClient } from 'viem';
+import { ValidationError } from '../..//types/utils.type';
+import { ProtocolConfigMap } from '../../config';
+
 export function getBoolean(str: string | undefined, defaultVal?: boolean) {
   try {
     if (str === '' || typeof str === 'undefined') throw new Error(`'${str}' is not a boolean`);
@@ -54,6 +58,13 @@ export function getBigInt(str: string | undefined, { defaultVal = undefined } = 
   }
 }
 
+export async function waitTxReceipt({ publicClient }: { publicClient: PublicClient }, txHash: `0x${string}`) {
+  const receipt = await publicClient.waitForTransactionReceipt({
+    hash: txHash,
+  });
+  return receipt;
+}
+
 export function getStringArray(str: string | undefined, defaultVal?: string[]) {
   try {
     if (str === '' || typeof str === 'undefined') {
@@ -65,5 +76,16 @@ export function getStringArray(str: string | undefined, defaultVal?: string[]) {
     return str.split(',');
   } catch (error) {
     throw new Error(`'${str}' is not a string`);
+  }
+}
+
+export function isSupportedChain(chainId: number) {
+  const supportedChains = Object.values(ProtocolConfigMap).map(v => v.CHAIN.id);
+  return supportedChains.includes(chainId);
+}
+
+export function validateOrThrow(condition: any, message: string): asserts condition {
+  if (!condition) {
+    throw new ValidationError(message);
   }
 }

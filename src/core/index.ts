@@ -8,6 +8,7 @@ export * from './readContracts/getRedemptionHints';
 export * from './readContracts/getNominalICR';
 export * from './readContracts/getTroves';
 export * from './readContracts/getIsApprovedDelegate';
+export * from './readContracts/getEntireDebtAndColl';
 
 // writeContracts
 export * from './writeContracts/approveDelegate';
@@ -29,3 +30,11 @@ export * from './utils/helper';
 export * from './utils/getHint';
 export * from './utils/retry';
 export * from './utils/getTotalDebtAmt';
+
+// operation
+export * from './operation/doOpenTrove';
+export * from './operation/doDeposit';
+export * from './operation/doBorrow';
+export * from './operation/doRepay';
+export * from './operation/doWithdraw';
+export * from './operation/doCloseTrove';

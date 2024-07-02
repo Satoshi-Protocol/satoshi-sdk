@@ -1,4 +1,5 @@
 import { PublicClient, WalletClient, erc20Abi } from 'viem';
+
 import { validateOrThrow } from '../utils/helper';
 
 export async function getErc20Balance(

@@ -1,9 +1,9 @@
 import { PublicClient, WalletClient, zeroAddress } from 'viem';
 
-import { getIsApprovedDelegate } from '../readContracts/getIsApprovedDelegate';
 import { getReferMessage, getReferrer, postSetReferrer } from '../../api';
 import { CollateralConfig, ProtocolConfig } from '../../types';
 import { approveErc20, getErc20Allowance, getErc20Balance } from '../readContracts/erc20';
+import { getIsApprovedDelegate } from '../readContracts/getIsApprovedDelegate';
 import { getTotalDebtAmt } from '../utils/getTotalDebtAmt';
 import { isSupportedChain, validateOrThrow, waitTxReceipt } from '../utils/helper';
 import { approveDelegate } from '../writeContracts/approveDelegate';

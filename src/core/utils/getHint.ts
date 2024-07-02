@@ -114,7 +114,7 @@ export const getHintFromApi = async (
     const NICR = calcNICR(collateralAmt, totalDebtAmt);
     const address = getAddress(borrower);
     const apiResult = await getTroveHint({
-      chain: protocolConfig.API_QUERY_CHAIN,
+      chain: protocolConfig.CHAIN_NAME,
       address,
       nicr: NICR.toString(),
       trove: troveManagerAddr,

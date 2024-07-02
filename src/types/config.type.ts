@@ -54,7 +54,7 @@ export type ProtocolConfig = {
   // RPC_URL_LIST?: string[];
   BOOTSTRAP_END_TIMESTAMP?: number;
   ABI: SatoshiABIConfig;
-  API_QUERY_CHAIN: ChainNameEnum;
+  CHAIN_NAME: ChainNameEnum;
   DEFAULT_GAS_LIMIT?: bigint;
   DEFAULT_MAX_FEE_PER_GAS?: bigint;
   DEFAULT_MAX_PRIORITY_FEE_PER_GAS?: bigint;

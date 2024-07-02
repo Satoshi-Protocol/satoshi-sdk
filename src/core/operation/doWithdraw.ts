@@ -1,7 +1,6 @@
 import { PublicClient, WalletClient } from 'viem';
 
 import { CollateralConfig, ProtocolConfig } from '../../types';
-import { approveErc20, getErc20Allowance, getErc20Balance } from '../readContracts/erc20';
 import { getEntireDebtAndColl } from '../readContracts/getEntireDebtAndColl';
 import { getIsApprovedDelegate } from '../readContracts/getIsApprovedDelegate';
 import { isSupportedChain, validateOrThrow, waitTxReceipt } from '../utils/helper';

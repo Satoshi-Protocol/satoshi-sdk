@@ -38,3 +38,5 @@ export * from './operation/doBorrow';
 export * from './operation/doRepay';
 export * from './operation/doWithdraw';
 export * from './operation/doCloseTrove';
+
+export * from './satoshi';

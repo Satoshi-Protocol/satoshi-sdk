@@ -6,25 +6,20 @@ import { MOCK_BEVM_MAINNET } from './mock';
 import { MOCK_ACCOUNT_MAP } from './mock/account.mock';
 import {
   DEBT_TOKEN_DECIMALS,
-  doBorrow,
-  doDeposit,
-  doOpenTrove,
-  doRepay,
-  doWithdraw,
+  SatoshiProtocol,
   getPublicClientByConfig,
   getWalletClientByConfig,
   waitTxReceipt,
   wbtcABI,
 } from '../src';
-jest.setTimeout(60 * 1000);
+jest.setTimeout(120 * 1000);
 
 describe('writeContracts', () => {
   const protocolConfig = MOCK_BEVM_MAINNET;
+  const account = privateKeyToAccount(MOCK_ACCOUNT_MAP.account1.priv as `0x${string}`);
   const publicClient = getPublicClientByConfig(protocolConfig);
-  const walletClient = getWalletClientByConfig(
-    protocolConfig,
-    privateKeyToAccount(MOCK_ACCOUNT_MAP.account1.priv as `0x${string}`)
-  );
+  const walletClient = getWalletClientByConfig(protocolConfig, account);
+  const satoshiProtocol = new SatoshiProtocol(protocolConfig, walletClient);
 
   const collateral = protocolConfig.COLLATERALS[0];
   it(`openTrove: (${protocolConfig.CHAIN.name})`, async () => {
@@ -42,10 +37,7 @@ describe('writeContracts', () => {
     });
     await waitTxReceipt({ publicClient }, depositHash);
 
-    const receipt = await doOpenTrove({
-      publicClient,
-      walletClient,
-      protocolConfig,
+    const receipt = await satoshiProtocol.doOpenTrove({
       collateral,
       borrowingAmt,
       totalCollAmt,
@@ -67,10 +59,7 @@ describe('writeContracts', () => {
     });
     await waitTxReceipt({ publicClient }, depositHash);
 
-    const receipt = await doDeposit({
-      publicClient,
-      walletClient,
-      protocolConfig,
+    const receipt = await satoshiProtocol.doDeposit({
       collateral,
       addedCollAmt,
     });
@@ -80,10 +69,7 @@ describe('writeContracts', () => {
   it(`borrow: (${protocolConfig.CHAIN.name})`, async () => {
     const addBorrowingAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
 
-    const receipt = await doBorrow({
-      publicClient,
-      walletClient,
-      protocolConfig,
+    const receipt = await satoshiProtocol.doBorrow({
       collateral,
       addBorrowingAmt,
     });
@@ -93,10 +79,7 @@ describe('writeContracts', () => {
   it(`withdraw: (${protocolConfig.CHAIN.name})`, async () => {
     const withdrawCollAmt = parseEther('0.01');
 
-    const receipt = await doWithdraw({
-      publicClient,
-      walletClient,
-      protocolConfig,
+    const receipt = await satoshiProtocol.doWithdraw({
       collateral,
       withdrawCollAmt,
     });
@@ -106,10 +89,7 @@ describe('writeContracts', () => {
   it(`repay: (${protocolConfig.CHAIN.name})`, async () => {
     const repayAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
 
-    const receipt = await doRepay({
-      publicClient,
-      walletClient,
-      protocolConfig,
+    const receipt = await satoshiProtocol.doRepay({
       collateral,
       repayAmt,
     });

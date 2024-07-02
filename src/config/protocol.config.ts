@@ -24,9 +24,9 @@ export const MAX_ITERATIONS = 50;
 export const OSHI_TOKEN_DECIMALS = 18;
 
 const BEVM_MAINNET: ProtocolConfig = {
+  CHAIN_NAME: ChainNameEnum.BEVM_MAINNET,
   CHAIN: bevm_mainnet,
   ABI: BEVM_ABI,
-  API_QUERY_CHAIN: ChainNameEnum.BEVM_MAINNET,
   DEFAULT_GAS_LIMIT: BigInt(500000),
   DEFAULT_MAX_FEE_PER_GAS: parseUnits('0.05', 9), // 0.05 gwei
   DEFAULT_MAX_PRIORITY_FEE_PER_GAS: BigInt(0),
@@ -97,8 +97,8 @@ const BEVM_MAINNET: ProtocolConfig = {
 };
 
 const BITLAYER_MAINNET: ProtocolConfig = {
+  CHAIN_NAME: ChainNameEnum.BITLAYER_MAINNET,
   CHAIN: bitlayer_mainnet,
-  API_QUERY_CHAIN: ChainNameEnum.BITLAYER_MAINNET,
   BOOTSTRAP_END_TIMESTAMP: 1718561110,
   ABI: BITLAYER_ABI,
   MIN_BORROWING_AMOUNT: 100, // 100 debt token

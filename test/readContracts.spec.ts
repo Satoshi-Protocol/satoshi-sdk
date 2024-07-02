@@ -7,8 +7,12 @@ import {
   TRIAL_NUMBER,
   getApproxHint,
   getBorrowingFee,
+  getEntireDebtAndColl,
   getInsertPosition,
+  getIsApprovedDelegate,
   getNominalICR,
+  getNumTroves,
+  getTroves
 } from '../src';
 import { bevmPublicClient, bitlayerPublicClient } from './mock';
 
@@ -17,8 +21,36 @@ jest.setTimeout(5000);
 describe('BEVM readContracts', () => {
   const protocolConfig = ProtocolConfigMap.BEVM_MAINNET;  
   const publicClient = bevmPublicClient;
-
   const collaterals = protocolConfig.COLLATERALS;
+
+  it(`getEntireDebtAndColl (${protocolConfig.CHAIN.name})`, async () => {
+    const result = await getEntireDebtAndColl(
+      {
+        publicClient,
+        protocolConfig,
+        troveManagerAddr: collaterals[0].TROVE_MANAGER_BEACON_PROXY_ADDRESS,
+      },
+      zeroAddress
+    );
+
+    expect(result.debt).toBeDefined();
+    expect(result.coll).toBeDefined();
+    expect(result.pendingDebtReward).toBeDefined();
+    expect(result.pendingCollateralReward).toBeDefined();
+  });
+
+  it(`getIsApprovedDelegate (${protocolConfig.CHAIN.name})`, async () => {
+    const result = await getIsApprovedDelegate(
+      {
+        publicClient,
+        protocolConfig
+      },
+      zeroAddress
+    );
+
+    expect(result).toBeDefined();
+  });
+
   for (const collateral of collaterals) {
     describe(`Collateral: ${collateral.NAME}`, () => {
       it(`getApproxHint: should return approx hint (${protocolConfig.CHAIN.name})`, async () => {
@@ -96,14 +128,74 @@ describe('BEVM readContracts', () => {
 
         expect(result.toString()).toBe(maxUint256.toString());
       });
+
+      it(`getTroves (${protocolConfig.CHAIN.name}) should not be defined`, async () => {
+        const result = await getTroves(
+          {
+            publicClient,
+            protocolConfig,
+            troveManagerAddr: collateral.TROVE_MANAGER_BEACON_PROXY_ADDRESS,
+          },
+          zeroAddress
+        );
+
+        expect(result).toBeDefined();
+        expect(result.debt).toBeDefined();
+        expect(result.coll).toBeDefined();
+        expect(result.stake).toBeDefined();
+        expect(result.status).toBeDefined();
+        expect(result.arrayIndex).toBeDefined();
+        expect(result.activeInterestIndex).toBeDefined();
+      });
+
+      it(`getNumTroves (${protocolConfig.CHAIN.name})`, async () => {
+        const result = await getNumTroves(
+          {
+            publicClient,
+            protocolConfig,
+            sortedTrovesAddr: collateral.SORTED_TROVE_BEACON_PROXY_ADDRESS,
+          }
+        );
+
+        expect(result > 0n).toBeTruthy();
+      });
     });
   }
+  
 });
 
 
 describe('Bitlayer readContracts', () => {
   const protocolConfig = ProtocolConfigMap.BITLAYER_MAINNET;  
   const publicClient = bitlayerPublicClient;
+
+  it(`getEntireDebtAndColl (${protocolConfig.CHAIN.name})`, async () => {
+    const result = await getEntireDebtAndColl(
+      {
+        publicClient,
+        protocolConfig,
+        troveManagerAddr: collaterals[0].TROVE_MANAGER_BEACON_PROXY_ADDRESS,
+      },
+      zeroAddress
+    );
+
+    expect(result.debt).toBeDefined();
+    expect(result.coll).toBeDefined();
+    expect(result.pendingDebtReward).toBeDefined();
+    expect(result.pendingCollateralReward).toBeDefined();
+  });
+
+  it(`getIsApprovedDelegate (${protocolConfig.CHAIN.name})`, async () => {
+    const result = await getIsApprovedDelegate(
+      {
+        publicClient,
+        protocolConfig
+      },
+      zeroAddress
+    );
+
+    expect(result).toBeDefined();
+  });
 
   const collaterals = protocolConfig.COLLATERALS;
   for (const collateral of collaterals) {
@@ -182,6 +274,37 @@ describe('Bitlayer readContracts', () => {
 
         expect(result.toString()).toBe(maxUint256.toString());
       });
+    });
+
+    it(`getTroves (${protocolConfig.CHAIN.name}) should not be defined`, async () => {
+      const result = await getTroves(
+        {
+          publicClient,
+          protocolConfig,
+          troveManagerAddr: collateral.TROVE_MANAGER_BEACON_PROXY_ADDRESS,
+        },
+        zeroAddress
+      );
+
+      expect(result).toBeDefined();
+      expect(result.debt).toBeDefined();
+      expect(result.coll).toBeDefined();
+      expect(result.stake).toBeDefined();
+      expect(result.status).toBeDefined();
+      expect(result.arrayIndex).toBeDefined();
+      expect(result.activeInterestIndex).toBeDefined();
+    });
+
+    it(`getNumTroves (${protocolConfig.CHAIN.name})`, async () => {
+      const result = await getNumTroves(
+        {
+          publicClient,
+          protocolConfig,
+          sortedTrovesAddr: collateral.SORTED_TROVE_BEACON_PROXY_ADDRESS,
+        }
+      );
+
+      expect(result > 0n).toBeTruthy();
     });
   }
 });

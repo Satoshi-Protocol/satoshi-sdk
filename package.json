@@ -11,6 +11,7 @@
     "build": "tsc --project tsconfig.build.json",
     "test": "jest --coverage",
     "fork:bevm": "anvil --port 8545 --fork-url https://rpc-mainnet-1.bevm.io/",
+    "fork:bitlayer": "anvil --port 8546 --fork-url https://rpc.bitlayer.org",
     "clean": "rm -rf ./lib/",
     "cm": "cz",
     "prepare": "husky install",

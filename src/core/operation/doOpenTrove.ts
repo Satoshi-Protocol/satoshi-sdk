@@ -51,6 +51,7 @@ export const doOpenTrove = async ({
   // check and set referrer
   if (referrer && referrer !== zeroAddress) {
     const referrerFromApi = await getReferrer(walletClient.account.address);
+    // FIXME: if referrer is not set, (referrerFromApi.referrer !== zeroAddress) will be true
     if (referrerFromApi?.referrer || referrerFromApi.referrer !== zeroAddress) {
       validateOrThrow(referrer === referrerFromApi.referrer, 'Referrer not match');
     }

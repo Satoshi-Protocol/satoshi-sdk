@@ -5,6 +5,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { MOCK_BEVM_MAINNET } from './mock';
 import { MOCK_ACCOUNT_MAP } from './mock/account.mock';
 import { getPublicClientByConfig, getWalletClientByConfig } from '../src';
+jest.setTimeout(60 * 1000);
 
 describe('network', () => {
   const protocolConfig = MOCK_BEVM_MAINNET;

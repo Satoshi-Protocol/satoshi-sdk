@@ -3,6 +3,8 @@ import { PublicClient, WalletClient } from 'viem';
 import { CollateralConfig, ProtocolConfig } from '../../types';
 import { getEntireDebtAndColl } from '../readContracts/getEntireDebtAndColl';
 import { getIsApprovedDelegate } from '../readContracts/getIsApprovedDelegate';
+import { getPrice } from '../readContracts/getPrice';
+import { assertCR } from '../utils/assertion';
 import { isSupportedChain, validateOrThrow, waitTxReceipt } from '../utils/helper';
 import { approveDelegate } from '../writeContracts/approveDelegate';
 import { withdraw } from '../writeContracts/withdraw';
@@ -41,6 +43,22 @@ export const doWithdraw = async ({
   );
   const totalCollAmt = troveInfo.coll - withdrawCollAmt;
   const totalDebtAmt = troveInfo.debt;
+
+  // check CR
+  const collUsdPrice = await getPrice(
+    {
+      protocolConfig,
+      publicClient,
+    },
+    collateral.ADDRESS
+  );
+  assertCR({
+    minCrPercentage: collateral.MIN_CR,
+    totalCollAmt,
+    totalDebtAmt,
+    collDecimals: collateral.DECIMALS,
+    collUsdPrice,
+  });
 
   // check delegate approval
   const isApprovedDelegate = await getIsApprovedDelegate(

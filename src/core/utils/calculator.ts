@@ -18,6 +18,18 @@ export const calcBorrowingFee = (borrowingAmt: bigint, borrowingRateWithDecay: b
   return (borrowingAmt * borrowingRateWithDecay) / 10n ** BigInt(DEBT_TOKEN_DECIMALS);
 };
 
+export const calcTokenUsdValue = ({
+  tokenAmt,
+  tokenUsdPrice,
+  tokenDecimals,
+}: {
+  tokenAmt: bigint;
+  tokenUsdPrice: bigint;
+  tokenDecimals: number;
+}) => {
+  return (tokenAmt * tokenUsdPrice) / 10n ** BigInt(tokenDecimals);
+};
+
 export const calcNICR = (collateralAmt: bigint, totalDebtAmt: bigint) => {
   const NICR = (collateralAmt * parseUnits('1', NICR_DECIMALS)) / totalDebtAmt;
   return NICR;

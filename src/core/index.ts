@@ -9,6 +9,7 @@ export * from './readContracts/getNominalICR';
 export * from './readContracts/getTroves';
 export * from './readContracts/getIsApprovedDelegate';
 export * from './readContracts/getEntireDebtAndColl';
+export * from './readContracts/getPrice';
 
 // writeContracts
 export * from './writeContracts/approveDelegate';
@@ -30,6 +31,7 @@ export * from './utils/helper';
 export * from './utils/getHint';
 export * from './utils/retry';
 export * from './utils/getTotalDebtAmt';
+export * from './utils/assertion';
 
 // operation
 export * from './operation/doOpenTrove';

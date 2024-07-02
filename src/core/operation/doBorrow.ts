@@ -3,6 +3,8 @@ import { PublicClient, WalletClient } from 'viem';
 import { CollateralConfig, ProtocolConfig } from '../../types';
 import { getEntireDebtAndColl } from '../readContracts/getEntireDebtAndColl';
 import { getIsApprovedDelegate } from '../readContracts/getIsApprovedDelegate';
+import { getPrice } from '../readContracts/getPrice';
+import { assertCR } from '../utils/assertion';
 import { isSupportedChain, validateOrThrow, waitTxReceipt } from '../utils/helper';
 import { approveDelegate } from '../writeContracts/approveDelegate';
 import { borrow } from '../writeContracts/borrow';
@@ -31,6 +33,11 @@ export const doBorrow = async ({
   const collateralConfig = collaterals.find(c => c.ADDRESS === collateral.ADDRESS);
   validateOrThrow(!!collateralConfig, 'Collateral not found');
 
+  // const CR = calcCR
+  // readableCR.greaterThanOrEqualTo(collateral.MIN_CR * 100) &&
+  // Number(readableBorrowingAmtStr) >=
+  //   protocolConfig.MIN_BORROWING_AMOUNT &&
+
   const troveInfo = await getEntireDebtAndColl(
     {
       publicClient,
@@ -41,6 +48,22 @@ export const doBorrow = async ({
   );
   const totalCollAmt = troveInfo.coll;
   const totalDebtAmt = troveInfo.debt + addBorrowingAmt;
+
+  // check CR
+  const collUsdPrice = await getPrice(
+    {
+      protocolConfig,
+      publicClient,
+    },
+    collateral.ADDRESS
+  );
+  assertCR({
+    minCrPercentage: collateral.MIN_CR,
+    totalCollAmt,
+    totalDebtAmt,
+    collDecimals: collateral.DECIMALS,
+    collUsdPrice,
+  });
 
   // check delegate approval
   const isApprovedDelegate = await getIsApprovedDelegate(

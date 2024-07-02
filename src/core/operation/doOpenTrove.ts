@@ -1,9 +1,14 @@
-import { PublicClient, WalletClient, zeroAddress } from 'viem';
+import BigNumber from 'bignumber.js';
+import { PublicClient, WalletClient, parseUnits, zeroAddress } from 'viem';
+
+import { DEBT_TOKEN_DECIMALS } from 'src/config';
 
 import { getReferMessage, getReferrer, postSetReferrer } from '../../api';
 import { CollateralConfig, ProtocolConfig } from '../../types';
 import { approveErc20, getErc20Allowance, getErc20Balance } from '../readContracts/erc20';
 import { getIsApprovedDelegate } from '../readContracts/getIsApprovedDelegate';
+import { getPrice } from '../readContracts/getPrice';
+import { assertCR, assertMinBorrowingAmount } from '../utils/assertion';
 import { getTotalDebtAmt } from '../utils/getTotalDebtAmt';
 import { isSupportedChain, validateOrThrow, waitTxReceipt } from '../utils/helper';
 import { approveDelegate } from '../writeContracts/approveDelegate';
@@ -36,6 +41,12 @@ export const doOpenTrove = async ({
   const collaterals = protocolConfig.COLLATERALS;
   const collateralConfig = collaterals.find(c => c.ADDRESS === collateral.ADDRESS);
   validateOrThrow(!!collateralConfig, 'Collateral not found');
+
+  // check borrowing amount
+  assertMinBorrowingAmount({
+    formattedMinBorrowingAmt: protocolConfig.MIN_BORROWING_AMOUNT,
+    borrowingAmt,
+  });
 
   // check and set referrer
   if (referrer && referrer !== zeroAddress) {
@@ -115,6 +126,22 @@ export const doOpenTrove = async ({
     },
     borrowingAmt
   );
+
+  // check CR
+  const collUsdPrice = await getPrice(
+    {
+      protocolConfig,
+      publicClient,
+    },
+    collateral.ADDRESS
+  );
+  assertCR({
+    minCrPercentage: collateral.MIN_CR,
+    totalCollAmt,
+    totalDebtAmt,
+    collDecimals: collateral.DECIMALS,
+    collUsdPrice,
+  });
 
   const txHash = await openTrove({
     publicClient,

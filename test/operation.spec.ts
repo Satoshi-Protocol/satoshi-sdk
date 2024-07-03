@@ -80,6 +80,8 @@ describe('Bevm trove operations', () => {
       });
       await waitTxReceipt({ publicClient }, depositHash);
 
+      console.log("address: ", _account.address)
+      console.log("referrer: ", '0xABE73bfFcd8Bc046EbD70038797f7cade4dC892F')
       const receipt = await _satoshiProtocol.TroveManager.doOpenTrove({
         collateral,
         borrowingAmt,
@@ -454,7 +456,125 @@ describe('Bevm trove operations', () => {
     });
   });
 
-  // TODO: close trove
+  describe(`trove redeem: (${protocolConfig.CHAIN.name})`, () => {
+    it(`redeem should be success`, async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+
+      const receipt = await satoshiClient.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
+      expect(receipt.status).toBe('success');
+    });
+
+    it('redeem should check unsupported chain', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
+    });
+
+    it('redeem should check wallet account', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
+    });
+
+    it('redeem should check invalid collateral', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        // @ts-ignore
+        await satoshiProtocol.TroveManager.doRedeem(invalidCollateral, estimatedRedeemAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
+
+    it('redeem should check hint', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      try {
+        // @ts-ignore
+        await satoshiProtocol.TroveManager.doRedeem(collateral, estimatedRedeemAmt, '0x');
+      } catch (e: any) {
+        expect(e.message).toBe('No hint found');
+      }
+    });
+  });
+
+  describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
+    it(`deposit should be success`, async () => {
+      const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const receipt = await satoshiClient.StabilityPool.doDeposit(depositAmt);
+      expect(receipt.status).toBe('success');
+    });
+
+    it('deposit should check SAT balance', async() => {
+      const depositAmt = parseUnits('10001', DEBT_TOKEN_DECIMALS);
+      try {
+        await satoshiClient.StabilityPool.doDeposit(depositAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('Insufficient SAT balance');
+      }
+    });
+
+    // TODO: mock getErc20Allowance
+    it('deposit should check allowence', async() => {
+      // const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      // try {
+      //   await satoshiClient.StabilityPool.doDeposit(depositAmt);
+      // } catch (e: any) {
+      //   expect(e.message).toBe('Insufficient allowance');
+      // }
+    });
+  });
+
+  describe(`stability pool withdraw: (${protocolConfig.CHAIN.name})`, () => {
+    it('withdraw should be success', async () => {
+      const withdrawAmt = parseUnits('2', DEBT_TOKEN_DECIMALS);
+      const receipt = await satoshiClient.StabilityPool.doWithdraw(withdrawAmt);
+      expect(receipt.status).toBe('success');
+    });
+  });
+
+  describe(`stability pool claim: (${protocolConfig.CHAIN.name})`, () => {
+    it('claim should be success', async () => {
+      const collaterals = satoshiClient.getCollateralConfig();
+      const collateralGains = await satoshiClient.StabilityPool.getCollateralGains();
+      let hasCollateralClaimable = false;
+      for (let i = 0; i < collaterals.length; i++) {
+        const collateral = collaterals[i];
+        const gain = collateralGains[i];
+        console.log({
+          name: collateral.NAME,
+          gain: gain.toString(),
+        });
+        if (gain > 0n) {
+          hasCollateralClaimable = true;
+        }
+      }
+      if (hasCollateralClaimable) {
+        const receipt = await satoshiClient.StabilityPool.doClaim();
+        expect(receipt.status).toBe('success');
+      }
+    });
+  });
 });
 
 
@@ -961,7 +1081,7 @@ describe('Bitlayer trove operations', () => {
     });
   });
 
-  describe(`stability pool deposit: ${protocolConfig.CHAIN.name}`, () => {
+  describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
     it(`deposit should be success`, async () => {
       const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
       const receipt = await satoshiProtocol.StabilityPool.doDeposit(depositAmt);
@@ -988,7 +1108,7 @@ describe('Bitlayer trove operations', () => {
     });
   });
 
-  describe(`stability pool withdraw: ${protocolConfig.CHAIN.name}`, () => {
+  describe(`stability pool withdraw: (${protocolConfig.CHAIN.name})`, () => {
     it('withdraw should be success', async () => {
       const withdrawAmt = parseUnits('2', DEBT_TOKEN_DECIMALS);
       const receipt = await satoshiProtocol.StabilityPool.doWithdraw(withdrawAmt);
@@ -996,7 +1116,7 @@ describe('Bitlayer trove operations', () => {
     });
   });
 
-  describe(`stability pool claim: ${protocolConfig.CHAIN.name}`, () => {
+  describe(`stability pool claim: (${protocolConfig.CHAIN.name})`, () => {
     it('claim should be success', async () => {
       const collaterals = satoshiProtocol.getCollateralConfig();
       const collateralGains = await satoshiProtocol.StabilityPool.getCollateralGains();

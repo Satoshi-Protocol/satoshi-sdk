@@ -35,7 +35,7 @@ export const mock_bevm_mainnet = defineChain({
 
 export const mock_bitlayer_mainnet = defineChain({
   id: 200901,
-  name: 'Bitlayer Mainnet',
+  name: 'Mock Bitlayer Mainnet',
   nativeCurrency: {
     decimals: 18,
     name: 'Bitcoin',

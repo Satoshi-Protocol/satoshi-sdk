@@ -10,7 +10,6 @@ export const withdrawFromSp = async ({
 }: {
   publicClient: PublicClient;
   walletClient: WalletClient;
-
   protocolConfig: ProtocolConfig;
   withdrawAmt: bigint;
 }): Promise<`0x${string}`> => {

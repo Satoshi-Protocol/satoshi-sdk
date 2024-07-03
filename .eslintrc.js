@@ -36,10 +36,8 @@ module.exports = {
     'node/no-missing-require': 'off',
     'node/shebang': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
-    quotes: ['warn', 'single', { avoidEscape: true }],
     'node/no-unpublished-import': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
@@ -56,14 +54,7 @@ module.exports = {
     'import/order': [
       'warn',
       {
-        groups: [
-          'builtin',
-          'external',
-          'internal',
-          ['sibling', 'parent'],
-          'index',
-          'unknown',
-        ],
+        groups: ['builtin', 'external', 'internal', ['sibling', 'parent'], 'index', 'unknown'],
         'newlines-between': 'always',
         alphabetize: {
           /* sort in ascending order. Options: ['ignore', 'asc', 'desc'] */
@@ -80,28 +71,32 @@ module.exports = {
     'prefer-const': 'warn',
     'no-empty-function': 'warn',
     'no-console': 'warn',
-    'indent': ['error', 2, { 'SwitchCase': 1, 'ignoredNodes': ['PropertyDefinition'] }],
+    indent: ['off', 2, { SwitchCase: 1, ignoredNodes: ['PropertyDefinition'] }],
     'linebreak-style': ['error', 'unix'],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'always'],
-    'comma-dangle': ['error', {
-      "arrays": "only-multiline",
-      "objects": "only-multiline",
-      "imports": "only-multiline",
-      "exports": "only-multiline",
-      "functions": "only-multiline"
-    }],
+    quotes: ['error', 'single'],
+    semi: ['error', 'always'],
+    'comma-dangle': [
+      'error',
+      {
+        arrays: 'only-multiline',
+        objects: 'only-multiline',
+        imports: 'only-multiline',
+        exports: 'only-multiline',
+        functions: 'only-multiline',
+      },
+    ],
     'no-cond-assign': ['error', 'always'],
     'no-trailing-spaces': 'error',
     'no-multi-spaces': ['error', { ignoreEOLComments: true }],
-    "object-curly-newline": ["error", {
-      "ImportDeclaration": { "multiline": true, "minProperties": 4 },
-      "ExportDeclaration": { "multiline": true, "minProperties": 4 }
-    }],
-    "no-unused-vars": ["warn", { "vars": "all", "args": "none", "ignoreRestSiblings": false }],
-    "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }],
-    "no-duplicate-imports": ["error", { "includeExports": true }],
-    'object-curly-newline': 'off',
-    'indent': 'off',
+    'object-curly-newline': [
+      'error',
+      {
+        ImportDeclaration: { multiline: true, minProperties: 6 },
+        ExportDeclaration: { multiline: true, minProperties: 6 },
+      },
+    ],
+    'no-unused-vars': ['warn', { vars: 'all', args: 'none', ignoreRestSiblings: false }],
+    'no-unused-expressions': ['error', { allowShortCircuit: true, allowTernary: true }],
+    'no-duplicate-imports': ['error', { includeExports: true }],
   },
 };

@@ -27,25 +27,25 @@ export class SatoshiStabilityPool {
     this.walletClient = walletClient;
   }
 
-  async getCollateralGains() {
+  async getCollateralGains(address?: `0x${string}`) {
     validateOrThrow(!!this.walletClient.account, 'walletClient account is required');
     return await getDepositorCollateralGain(
       {
         publicClient: this.publicClient,
         protocolConfig: this.protocolConfig,
       },
-      this.walletClient.account.address
+      address || this.walletClient.account.address
     );
   }
 
-  async getDepositAmount() {
+  async getDepositAmount(address?: `0x${string}`) {
     validateOrThrow(!!this.walletClient.account, 'walletClient account is required');
     return await getCompoundedDebtDeposit(
       {
         publicClient: this.publicClient,
         protocolConfig: this.protocolConfig,
       },
-      this.walletClient.account.address
+      address || this.walletClient.account.address
     );
   }
 

@@ -1,7 +1,4 @@
-import BigNumber from 'bignumber.js';
-import { PublicClient, WalletClient, parseUnits, zeroAddress } from 'viem';
-
-import { DEBT_TOKEN_DECIMALS } from 'src/config';
+import { PublicClient, WalletClient, getAddress, zeroAddress } from 'viem';
 
 import { getReferMessage, getReferrer, postSetReferrer } from '../../api';
 import { CollateralConfig, ProtocolConfig } from '../../types';
@@ -50,23 +47,26 @@ export const doOpenTrove = async ({
 
   // check and set referrer
   if (referrer && referrer !== zeroAddress) {
+    const referrerAddress = getAddress(referrer);
     const referrerFromApi = await getReferrer(walletClient.account.address);
-    // FIXME: if referrer is not set, (referrerFromApi.referrer !== zeroAddress) will be true
-    if (referrerFromApi?.referrer || referrerFromApi.referrer !== zeroAddress) {
-      validateOrThrow(referrer === referrerFromApi.referrer, 'Referrer not match');
-    }
-    const setReferrerMessage = await getReferMessage(walletClient.account.address, referrer);
-    const signature = await walletClient.signMessage({
-      message: setReferrerMessage.message,
-      account: walletClient.account,
-    });
+    const dontHaveSetRef = !referrerFromApi || !referrerFromApi.referrer;
+    const hasSetRef = referrerFromApi?.referrer && referrerFromApi.referrer !== zeroAddress;
+    if (hasSetRef) {
+      validateOrThrow(referrerAddress === referrerFromApi.referrer, 'Referrer not match');
+    } else if (!dontHaveSetRef) {
+      const setReferrerMessage = await getReferMessage(walletClient.account.address, referrerAddress);
+      const signature = await walletClient.signMessage({
+        message: setReferrerMessage.message,
+        account: walletClient.account,
+      });
 
-    await postSetReferrer({
-      address: walletClient.account.address,
-      referrer,
-      signature,
-      message: setReferrerMessage.message,
-    });
+      await postSetReferrer({
+        address: walletClient.account.address,
+        referrer: referrerAddress,
+        signature,
+        message: setReferrerMessage.message,
+      });
+    }
   }
 
   // check delegate approval

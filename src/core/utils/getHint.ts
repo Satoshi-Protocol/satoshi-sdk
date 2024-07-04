@@ -141,7 +141,6 @@ export const getHintFromApi = async (
     }
     return undefined;
   } catch (error) {
-    console.error('getHintFromApi', error);
     return undefined;
   }
 };

@@ -29,14 +29,14 @@ export class SatoshiTroveManager {
     this.walletClient = walletClient;
   }
 
-  async getEntireDebtAndColl(collateral: CollateralConfig, address: `0x${string}`) {
+  async getEntireDebtAndColl(collateral: CollateralConfig, address?: `0x${string}`) {
     return await getEntireDebtAndColl(
       {
         publicClient: this.publicClient,
         protocolConfig: this.protocolConfig,
         troveManagerAddr: collateral.TROVE_MANAGER_BEACON_PROXY_ADDRESS,
       },
-      address
+      address || this.walletClient.account!.address
     );
   }
 

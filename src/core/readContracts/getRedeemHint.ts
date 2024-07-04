@@ -1,8 +1,7 @@
-import { PublicClient, maxUint256 } from 'viem';
+import { PublicClient } from 'viem';
 
 import { getApproxHint } from './getApproxHint';
 import { getInsertPosition } from './getInsertPosition';
-import { getNumTroves } from './getNumTroves';
 import { getRedemptionHints } from './getRedemptionHints';
 import { RANDOM_SEED, TRIAL_NUMBER } from '../../config';
 import { ProtocolConfig } from '../../types';

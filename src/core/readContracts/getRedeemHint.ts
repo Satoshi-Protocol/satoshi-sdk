@@ -45,13 +45,6 @@ export const getRedeemHint = async (
   );
   if (!redemptionHints) return undefined;
 
-  const numTroves = await getNumTroves({
-    publicClient,
-    protocolConfig,
-    sortedTrovesAddr,
-  });
-  const randNum = maxUint256 % numTroves;
-  // const numTrials = numTroves * BigInt(CONFIG.TRIAL_NUMBER);
   const approxHint = await getApproxHint(
     {
       publicClient,

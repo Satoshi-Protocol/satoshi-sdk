@@ -1,4 +1,4 @@
-import { getAddress, PublicClient, WalletClient, zeroAddress } from 'viem';
+import { PublicClient, WalletClient, getAddress, zeroAddress } from 'viem';
 
 import { getReferMessage, getReferrer, postSetReferrer } from '../../api';
 import { CollateralConfig, ProtocolConfig } from '../../types';

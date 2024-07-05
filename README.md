@@ -25,10 +25,11 @@ import { SatoshiClient, getWalletClientByConfig, ProtocolConfigMap, DEBT_TOKEN_D
 
 main()
 async function main() {
+  // Use BEVM Chain
+  const protocolConfig = ProtocolConfigMap.BEVM_MAINNET;
   const account = privateKeyToAccount(process.env.PRIV as `0x${string}`);
   const walletClient = getWalletClientByConfig(protocolConfig, account);
 
-  const protocolConfig = ProtocolConfigMap.BEVM_MAINNET;
   const satoshiClient = new SatoshiClient(protocolConfig, walletClient);
   const publicClient = satoshiClient.publicClient;
   

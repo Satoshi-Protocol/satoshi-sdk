@@ -1,4 +1,4 @@
-import { defineChain, createPublicClient, http } from 'viem';
+import { createPublicClient, defineChain, http } from 'viem';
 
 import { ProtocolConfig, ProtocolConfigMap } from '../../src';
 

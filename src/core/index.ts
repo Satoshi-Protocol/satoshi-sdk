@@ -42,3 +42,5 @@ export * from './operation/doWithdraw';
 export * from './operation/doCloseTrove';
 
 export * from './satoshi';
+export * from './satoshi-sp';
+export * from './satoshi-trove';

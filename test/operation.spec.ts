@@ -35,7 +35,8 @@ describe('Bevm trove operations', () => {
         });
       } catch (e: any) {
         expect(e.message).toBe('Referrer not match');
-      }});
+      }
+    });
 
     it('trove open without referrer should be success', async () => {
       const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
@@ -51,7 +52,7 @@ describe('Bevm trove operations', () => {
         value: totalCollAmt,
       });
       await waitTxReceipt({ publicClient }, depositHash);
-  
+
       const receipt = await satoshiClient.TroveManager.doOpenTrove({
         collateral,
         borrowingAmt,
@@ -249,7 +250,7 @@ describe('Bevm trove operations', () => {
         expect(e.message).toBe('Insufficient addedCollAmt balance');
       }
     });
-  })
+  });
 
   describe(`trove borrow: (${protocolConfig.CHAIN.name})`, () => {
     // ContractFunctionExecutionError: The contract function "findInsertPosition" reverted.
@@ -385,7 +386,7 @@ describe('Bevm trove operations', () => {
     // ContractFunctionExecutionError: The contract function "findInsertPosition" reverted.
     it('repay should be success', async () => {
       const repayAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
-  
+
       const receipt = await satoshiClient.TroveManager.doRepay({
         collateral,
         repayAmt,
@@ -459,7 +460,7 @@ describe('Bevm trove operations', () => {
   });
 
   describe(`trove redeem: (${protocolConfig.CHAIN.name})`, () => {
-    it(`redeem should be success`, async () => {
+    it('redeem should be success', async () => {
       const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
 
       const receipt = await satoshiClient.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
@@ -504,7 +505,7 @@ describe('Bevm trove operations', () => {
       };
       try {
         // @ts-ignore
-        await satoshiProtocol.TroveManager.doRedeem(invalidCollateral, estimatedRedeemAmt);
+        await satoshiClient.TroveManager.doRedeem(invalidCollateral, estimatedRedeemAmt);
       } catch (e: any) {
         expect(e.message).toBe('Collateral not found');
       }
@@ -515,7 +516,7 @@ describe('Bevm trove operations', () => {
       const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
       try {
         // @ts-ignore
-        await satoshiProtocol.TroveManager.doRedeem(collateral, estimatedRedeemAmt, '0x');
+        await satoshiClient.TroveManager.doRedeem(collateral, estimatedRedeemAmt, '0x');
       } catch (e: any) {
         expect(e.message).toBe('No hint found');
       }
@@ -524,13 +525,13 @@ describe('Bevm trove operations', () => {
 
   describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
     // ValidationError: Insufficient allowance
-    it(`deposit should be success`, async () => {
+    it('deposit should be success', async () => {
       const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
       const receipt = await satoshiClient.StabilityPool.doDeposit(depositAmt);
       expect(receipt.status).toBe('success');
     });
 
-    it('deposit should check SAT balance', async() => {
+    it('deposit should check SAT balance', async () => {
       const depositAmt = parseUnits('10001', DEBT_TOKEN_DECIMALS);
       try {
         await satoshiClient.StabilityPool.doDeposit(depositAmt);
@@ -540,7 +541,7 @@ describe('Bevm trove operations', () => {
     });
 
     // TODO: mock getErc20Allowance
-    it('deposit should check allowence', async() => {
+    it('deposit should check allowence', async () => {
       // const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
       // try {
       //   await satoshiClient.StabilityPool.doDeposit(depositAmt);

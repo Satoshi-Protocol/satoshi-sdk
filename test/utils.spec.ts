@@ -1,57 +1,46 @@
-import { assertMinBorrowingAmount, assertCR } from "../src/core/utils/assertion";
+import BigNumber from 'bignumber.js';
+import { privateKeyToAccount } from 'viem/accounts';
+
+import { MOCK_BEVM_MAINNET } from './mock';
+import { MOCK_ACCOUNT_MAP } from './mock/account.mock';
 import {
-  calcTotalDebtAmt,
-  calcNetDebtAmt,
   calcBorrowingFee,
-  calcTokenUsdValue,
-  calcNICR,
   calcCR,
+  calcLiquidationPrice,
+  calcNICR,
+  calcNetDebtAmt,
   calcReadableCollValToReadableBorrowDebt,
-  calcLiquidationPrice
-} from "../src/core/utils/calculator";
+  calcTokenUsdValue,
+  calcTotalDebtAmt,
+  getPublicClientByConfig,
+  getWalletClientByConfig,
+} from '../src';
+import { assertCR, assertMinBorrowingAmount } from '../src/core/utils/assertion';
+import { getHint, getHintFromApi, getHintFromContract } from '../src/core/utils/getHint';
+import { getTotalDebtAmt } from '../src/core/utils/getTotalDebtAmt';
 import {
-  getHintFromContract,
-  getHintFromApi,
-  getHint
-} from "../src/core/utils/getHint";
-import { getTotalDebtAmt } from "../src/core/utils/getTotalDebtAmt";
-import {
+  getBigInt,
   getBoolean,
   getNumber,
   getString,
-  getBigInt,
-  waitTxReceipt,
   getStringArray,
   isSupportedChain,
-  validateOrThrow
-} from "../src/core/utils/helper";
-import { retry } from "../src/core/utils/retry";
-import BigNumber from 'bignumber.js';
-import { MOCK_BEVM_MAINNET, MOCK_BITLAYER_MAINNET } from './mock';
-import {
-  DEBT_TOKEN_DECIMALS,
-  SatoshiProtocol,
-  getPublicClientByConfig,
-  getWalletClientByConfig,
-  wbtcABI,
-} from '../src';
-import { privateKeyToAccount } from 'viem/accounts';
-import { MOCK_ACCOUNT_MAP } from './mock/account.mock';
+  validateOrThrow,
+} from '../src/core/utils/helper';
+import { retry } from '../src/core/utils/retry';
 
 describe('utils function', () => {
   const protocolConfig = MOCK_BEVM_MAINNET;
-  const account = privateKeyToAccount(MOCK_ACCOUNT_MAP.account1.priv as `0x${string}`);
   const publicClient = getPublicClientByConfig(protocolConfig);
-  const walletClient = getWalletClientByConfig(protocolConfig, account);
-  const satoshiProtocol = new SatoshiProtocol(protocolConfig, walletClient);
 
   describe('assertion', () => {
     it('assertMinBorrowingAmount', () => {
       const formattedMinBorrowingAmt = 1000;
       const borrowingAmt = 1000n;
 
-      expect(() => assertMinBorrowingAmount({ formattedMinBorrowingAmt, borrowingAmt }))
-        .toThrowError('Borrowing amount is too low');
+      expect(() => assertMinBorrowingAmount({ formattedMinBorrowingAmt, borrowingAmt })).toThrowError(
+        'Borrowing amount is too low'
+      );
     });
     it('assertCR', () => {
       const minCrPercentage = 100;
@@ -60,8 +49,9 @@ describe('utils function', () => {
       const totalCollAmt = 1000n;
       const totalDebtAmt = 1000n;
 
-      expect(() => assertCR({ minCrPercentage, collUsdPrice, collDecimals, totalCollAmt, totalDebtAmt }))
-        .toThrowError('CR is too low');
+      expect(() => assertCR({ minCrPercentage, collUsdPrice, collDecimals, totalCollAmt, totalDebtAmt })).toThrowError(
+        'CR is too low'
+      );
     });
   });
   describe('calculator', () => {
@@ -107,7 +97,17 @@ describe('utils function', () => {
       const priceDecimals = 18;
       const CRDecimals = 18;
 
-      expect(calcCR(collateralAmt, collateralDecimals, totalDebtAmt, debtDecimals, collateralPrice, priceDecimals, CRDecimals)).toBe(1000n);
+      expect(
+        calcCR(
+          collateralAmt,
+          collateralDecimals,
+          totalDebtAmt,
+          debtDecimals,
+          collateralPrice,
+          priceDecimals,
+          CRDecimals
+        )
+      ).toBe(1000n);
     });
     it('calcReadableCollValToReadableBorrowDebt', () => {
       const collateralAmt = BigNumber(1000);
@@ -127,46 +127,58 @@ describe('utils function', () => {
   describe('getHint', () => {
     const troveManagerAddr = protocolConfig.COLLATERALS[0].TROVE_MANAGER_BEACON_PROXY_ADDRESS;
     const sortedTrovesAddr = protocolConfig.COLLATERALS[0].SORTED_TROVE_BEACON_PROXY_ADDRESS;
-    it('getHintFromContract', async() => {
-      const hint = await getHintFromContract({
-        publicClient,
-        protocolConfig,
-        troveManagerAddr,
-        sortedTrovesAddr
-      }, 1000n, 1000n);
+    it('getHintFromContract', async () => {
+      const hint = await getHintFromContract(
+        {
+          publicClient,
+          protocolConfig,
+          troveManagerAddr,
+          sortedTrovesAddr,
+        },
+        1000n,
+        1000n
+      );
 
       expect(hint).toBeDefined();
     });
 
-    it('getHintFromApi', async() => {
-      const hint = await getHintFromApi({
-        publicClient,
-        protocolConfig,
-        sortedTrovesAddr,
-        troveManagerAddr
-      }, '', 1000n, 1000n);
+    it('getHintFromApi', async () => {
+      const hint = await getHintFromApi(
+        {
+          publicClient,
+          protocolConfig,
+          sortedTrovesAddr,
+          troveManagerAddr,
+        },
+        '',
+        1000n,
+        1000n
+      );
 
       expect(hint).toBeDefined();
     });
 
-    it('getHint', async() => {
+    it('getHint', async () => {
       const payload = {
         address: '',
         totalCollAmt: 1000n,
-        totalDebtAmt: 1000n
+        totalDebtAmt: 1000n,
       };
-      const hint = await getHint({
-        publicClient,
-        protocolConfig,
-        sortedTrovesAddr,
-        troveManagerAddr
-      }, payload);
+      const hint = await getHint(
+        {
+          publicClient,
+          protocolConfig,
+          sortedTrovesAddr,
+          troveManagerAddr,
+        },
+        payload
+      );
 
       expect(hint).toBeDefined();
     });
   });
   describe('getTotalDebtAmt', () => {
-    it('getTotalDebtAmt', async() => {
+    it('getTotalDebtAmt', async () => {
       const troveManagerAddr = protocolConfig.COLLATERALS[0].TROVE_MANAGER_BEACON_PROXY_ADDRESS;
       const borrowingAmt = 1n;
       const result = await getTotalDebtAmt({ publicClient, protocolConfig, troveManagerAddr }, borrowingAmt);
@@ -208,13 +220,15 @@ describe('utils function', () => {
   });
   describe('retry', () => {
     it('retry', () => {
-      const fn = () => new Promise((resolve, reject) => {
-        resolve(null);
-      });
+      const fn = () =>
+        new Promise((resolve, reject) => {
+          resolve(null);
+        });
       const retryCount = 5;
       const retryDelay = 1;
 
       // TODO: how to test this?
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       retry(fn, retryCount, retryDelay);
       expect(retry(fn, retryCount, retryDelay)).not.toThrow();
     });

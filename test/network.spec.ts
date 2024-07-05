@@ -39,7 +39,6 @@ describe('BEVM network', () => {
   });
 });
 
-
 describe('Bitlayer network', () => {
   const protocolConfig = MOCK_BITLAYER_MAINNET;
   describe('publicClient', () => {

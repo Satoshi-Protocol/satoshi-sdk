@@ -13,7 +13,7 @@ import {
   wbtcABI,
 } from '../../src';
 
-jest.setTimeout(50 * 1000);
+jest.setTimeout(30 * 1000);
 
 const protocolConfig = MOCK_BEVM_MAINNET;
 
@@ -26,25 +26,35 @@ describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
   const collateral = protocolConfig.COLLATERALS[0];
 
   beforeAll(async () => {
-    const borrowingAmt = parseUnits('100', DEBT_TOKEN_DECIMALS);
-    const totalCollAmt = parseEther('0.1');
-    // wbtc
-    const depositHash = await walletClient.writeContract({
-      chain: protocolConfig.CHAIN,
-      account: walletClient.account,
-      address: collateral.ADDRESS,
-      abi: wbtcABI,
-      functionName: 'deposit',
-      args: [],
-      value: totalCollAmt,
-    });
-    await waitTxReceipt({ publicClient }, depositHash);
+    const currentPosition = await satoshiClient.TroveManager.getEntireDebtAndColl(collateral, account.address);
+    const { debt } = currentPosition;
+    if (debt > 0n) return;
 
-    await satoshiClient.TroveManager.doOpenTrove({
-      collateral,
-      borrowingAmt,
-      totalCollAmt,
-    });
+    let start = Date.now();
+    try {
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      const depositHash = await walletClient.writeContract({
+        chain: protocolConfig.CHAIN,
+        account: walletClient.account,
+        address: collateral.ADDRESS,
+        abi: wbtcABI,
+        functionName: 'deposit',
+        args: [],
+        value: totalCollAmt,
+      });
+
+      await waitTxReceipt({ publicClient }, depositHash);
+      console.log('depositHash time:', Date.now() - start, 'ms');
+      await satoshiClient.TroveManager.doOpenTrove({
+        collateral,
+        borrowingAmt,
+        totalCollAmt
+      })
+      console.log('doOpenTrove time:', Date.now() - start, 'ms');
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   it('deposit should be success', async () => {
@@ -60,15 +70,5 @@ describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
     } catch (e: any) {
       expect(e.message).toBe('Insufficient SAT balance');
     }
-  });
-
-  // TODO: mock getErc20Allowance
-  it('deposit should check allowence', async () => {
-    // const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
-    // try {
-    //   await satoshiClient.StabilityPool.doDeposit(depositAmt);
-    // } catch (e: any) {
-    //   expect(e.message).toBe('Insufficient allowance');
-    // }
   });
 });

@@ -79,7 +79,7 @@ export const doDeposit = async ({
     protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.SATOSHI_PERIPHERY_ADDRESS
   );
   if (collAllowance < addedCollAmt) {
-    const allowanceAmt = addedCollAmt - collAllowance;
+    const allowanceAmt = addedCollAmt;
     const approveCollHash = await approveErc20(
       {
         publicClient,

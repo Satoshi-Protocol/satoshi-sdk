@@ -105,7 +105,7 @@ export const doOpenTrove = async ({
     protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.SATOSHI_PERIPHERY_ADDRESS
   );
   if (collAllowance < totalCollAmt) {
-    const allowanceAmt = totalCollAmt - collAllowance;
+    const allowanceAmt = totalCollAmt;
     const approveCollHash = await approveErc20(
       {
         publicClient,

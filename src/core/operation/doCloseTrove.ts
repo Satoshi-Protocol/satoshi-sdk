@@ -77,7 +77,7 @@ export const doCloseTrove = async ({
     protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.SATOSHI_PERIPHERY_ADDRESS
   );
   if (satAllowance < repayAmt) {
-    const allowanceAmt = repayAmt - satAllowance;
+    const allowanceAmt = repayAmt;
     const approveCollHash = await approveErc20(
       {
         publicClient,

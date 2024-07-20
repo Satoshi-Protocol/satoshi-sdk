@@ -13,7 +13,7 @@ For documentation and guides, visit [docs.satoshiprotocol.org](https://docs.sato
 ## Community
 
 For help, discussion about best practices, or any other conversation that would benefit from being searchable:
-- [Discuss on GitHub](https://github.com/Satoshi-Protocol/satoshi-sdk/issues)
+- [Join the Telegram](https://t.me/satoshi_sat)
 - [Join the Discord](https://discord.gg/CakRgSnPVS)
 
 

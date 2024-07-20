@@ -8,7 +8,7 @@ Satoshi Protocol SDK, a comprehensive toolkit for developers to integrate and in
 
 ## Documentation
 
-For documentation and guides, visit [docs.satoshiprotocol.org/sdk](https://docs.satoshiprotocol.org/sdk/introduction).
+For documentation and guides, visit [docs.satoshiprotocol.org](https://docs.satoshiprotocol.org/sdk/introduction).
 
 ## Community
 

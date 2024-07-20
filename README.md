@@ -1,4 +1,4 @@
-![Banner](https://i.imgur.com/X26YuSj.png)
+![Banner](https://i.imgur.com/QhKQ20H.png)
 
 Satoshi Protocol SDK, a comprehensive toolkit for developers to integrate and interact with the Satoshi Protocol, a DeFi platform on the blockchain.
 

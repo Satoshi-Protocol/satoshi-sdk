@@ -20,6 +20,7 @@ npm install --save satoshi-sdk
 ### Example: Open trove
 ```typescript
 import { parseUnits, parseEther, defineChain, } from 'viem';
+
 import { privateKeyToAccount } from 'viem/accounts';
 import { SatoshiClient, getWalletClientByConfig, ProtocolConfigMap, DEBT_TOKEN_DECIMALS, wbtcABI, waitTxReceipt } from 'satoshi-sdk';
 

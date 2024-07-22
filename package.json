@@ -1,7 +1,7 @@
 {
   "name": "satoshi-sdk",
   "version": "0.0.4",
-  "description": "Satoshi Protocol SDK",
+  "description": "Satoshi Protocol SDK, a comprehensive toolkit for developers to integrate and interact with the Satoshi Protocol, a DeFi platform on the blockchain.",
   "main": "./lib/index.js",
   "files": [
     "lib/**/*",
@@ -33,20 +33,16 @@
     "node": ">=18.0"
   },
   "keywords": [
-    "boilerplate",
-    "template",
+    "satoshi-protocol",
+    "satoshi-sdk",
+    "viem",
     "typescript",
-    "vscode",
-    "jest",
-    "husky",
-    "commitizen",
-    "semantic-release",
-    "codecov"
+    "jest"
   ],
   "bugs": {
     "url": "https://github.com/Satoshi-Protocol/satoshi-sdk/issues"
   },
-  "homepage": "https://github.com/Satoshi-Protocol/satoshi-sdk#readme",
+  "homepage": "https://docs.satoshiprotocol.org/sdk/introduction",
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",

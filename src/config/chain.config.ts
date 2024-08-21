@@ -47,3 +47,27 @@ export const bitlayer_mainnet = defineChain({
   },
   contracts: {},
 });
+
+export const bob_mainnet = defineChain({
+  id: 60808,
+  name: 'BOB',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ethereum',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.gobob.xyz', 'https://bob-mainnet.public.blastapi.io'],
+      webSocket: ['wss://rpc.gobob.xyz', 'wss://bob-mainnet.public.blastapi.io'],
+    },
+    public: {
+      http: ['https://rpc.gobob.xyz', 'https://bob-mainnet.public.blastapi.io'],
+      webSocket: ['wss://rpc.gobob.xyz', 'wss://bob-mainnet.public.blastapi.io'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://explorer.gobob.xyz' },
+  },
+  contracts: {},
+});

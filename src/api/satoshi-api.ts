@@ -3,6 +3,7 @@ import { Address } from 'viem';
 
 import { SetReferrer, TroveHintRequestDto, WalletInDto } from './satoshi-api.type';
 import { SATO_API_URL } from '../config';
+import { ChainNameEnum } from 'src/types';
 
 const axiosInstance = axios.create({
   baseURL: SATO_API_URL,
@@ -69,4 +70,25 @@ export const getOatHolderList = async () => {
     oatHoldersStr: string;
     oatHolders: string[];
   };
+};
+
+export const getNymHistoryList = async (chain: ChainNameEnum, user: string) => {
+  if (!user || !chain) return [];
+
+  const response = await axiosInstance.get(`/nym?chain=${chain}&user=${user}`);
+  return response.data as {
+    txHash: string;
+    blockNumber: string;
+    txIndex: number;
+    logIndex: number;
+    contract: string;
+
+    asset: string;
+    user: string;
+    amount: string;
+    fee: string;
+    withdrawTime: number;
+
+    updatedTime: string; // ISO time
+  }[];
 };

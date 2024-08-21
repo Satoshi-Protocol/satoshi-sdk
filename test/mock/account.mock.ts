@@ -1,4 +1,11 @@
+import * as dotenv from 'dotenv';
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+dotenv.config();
+
 export const MOCK_ACCOUNT_MAP = {
+  fork_account: {
+    priv: process.env.TEST_PRIVATE_KEY,
+  },
   account1: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     priv: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',

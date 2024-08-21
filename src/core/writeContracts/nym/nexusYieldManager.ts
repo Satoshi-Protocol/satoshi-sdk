@@ -38,13 +38,13 @@ export const nymScheduleSwapOut = async ({
   walletClient,
   protocolConfig,
   asset,
-  amount,
+  satAmount,
 }: {
   publicClient: PublicClient;
   walletClient: WalletClient;
   protocolConfig: ProtocolConfig;
   asset: `0x${string}`;
-  amount: bigint;
+  satAmount: bigint;
 }): Promise<`0x${string}`> => {
   const simulateResult = await publicClient.simulateContract({
     chain: protocolConfig.CHAIN,
@@ -52,7 +52,7 @@ export const nymScheduleSwapOut = async ({
     address: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS!,
     abi: protocolConfig?.ABI.NexusYieldManager,
     functionName: 'scheduleSwapOut',
-    args: [asset, amount],
+    args: [asset, satAmount],
   });
 
   const hash = await walletClient.writeContract(simulateResult.request);

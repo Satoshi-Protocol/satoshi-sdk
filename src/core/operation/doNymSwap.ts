@@ -1,12 +1,13 @@
 import { PublicClient, WalletClient, parseUnits } from 'viem';
 
-import { DEBT_TOKEN_DECIMALS } from 'src/config';
-import { ProtocolConfig } from 'src/types';
-
+import { DEBT_TOKEN_DECIMALS } from '../../config';
+import { ProtocolConfig } from '../../types';
 import { getDebtTokenDailyMintCapRemain } from '../nym/getDebtTokenDailyMintCapRemain';
 import { getDebtTokenMinted } from '../nym/getDebtTokenMinted';
 import { getNymPendingWithdrawInfo } from '../nym/getNymPendingWithdrawInfo';
 import { getPreviewSwapIn, getPreviewSwapOut } from '../nym/getPreviewSwap';
+import { approveErc20, getErc20Allowance } from '../readContracts/erc20';
+import { waitTxReceipt } from '../utils/helper';
 import { nymScheduleSwapOut, nymSwapIn } from '../writeContracts/nym/nexusYieldManager';
 export enum ESwap {
   SWAPIN = 'SWAPIN', // receive SAT
@@ -43,7 +44,6 @@ export const isNymSwapValid = async ({
   }
 
   const debtTokenMinted = await getDebtTokenMinted({ publicClient, protocolConfig }, asset);
-  const debtTokenDailyMintCapRemain = await getDebtTokenDailyMintCapRemain({ publicClient, protocolConfig }, asset);
 
   const isDebtUnderflow = () => {
     if (isSwapIn) return false;
@@ -64,10 +64,11 @@ export const isNymSwapValid = async ({
     }
   };
 
+  const debtTokenDailyMintCapRemain = await getDebtTokenDailyMintCapRemain({ publicClient, protocolConfig }, asset);
   const isExceedDailyMintCapRemain = () => {
     if (isSwapOut) return false;
     if (!debtTokenDailyMintCapRemain) return false;
-    const swapInPreviewSatAmount = parseUnits(satAmount.toString(), DEBT_TOKEN_DECIMALS);
+    const swapInPreviewSatAmount = satAmount;
 
     return swapInPreviewSatAmount > debtTokenDailyMintCapRemain;
   };
@@ -95,6 +96,9 @@ export const doNymSwapIn = async ({
   assetDecimals: number;
 }): Promise<`0x${string}`> => {
   if (!walletClient.account) throw new Error('Wallet client account is undefined');
+  if (!protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS) {
+    throw new Error('This chain do not support Nexus Yield Manager');
+  }
 
   const satAmountInfo = await getPreviewSwapIn(
     {
@@ -120,6 +124,29 @@ export const doNymSwapIn = async ({
 
   if (!valid) throw new Error('invalid swap');
 
+  // check asset allowance
+  const assetAllowance = await getErc20Allowance(
+    {
+      publicClient,
+      tokenAddr: asset,
+    },
+    walletClient.account.address,
+    protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS
+  );
+  if (assetAllowance < assetAmount) {
+    const allowanceAmt = assetAmount - assetAllowance;
+    const approveCollHash = await approveErc20(
+      {
+        publicClient,
+        walletClient,
+        tokenAddr: asset,
+      },
+      protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS,
+      allowanceAmt
+    );
+    await waitTxReceipt({ publicClient }, approveCollHash);
+  }
+
   const hash = await nymSwapIn({
     publicClient,
     walletClient,
@@ -138,7 +165,7 @@ export const doNymSwapOut = async ({
   protocolConfig,
   asset,
   assetDecimals,
-  satAmount: amount,
+  satAmount,
 }: {
   publicClient: PublicClient;
   walletClient: WalletClient;
@@ -148,6 +175,9 @@ export const doNymSwapOut = async ({
   satAmount: bigint;
 }): Promise<`0x${string}`> => {
   if (!walletClient.account) throw new Error('Wallet client account is undefined');
+  if (!protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS) {
+    throw new Error('This chain do not support Nexus Yield Manager');
+  }
 
   const assetAmountInfo = await getPreviewSwapOut(
     {
@@ -155,9 +185,8 @@ export const doNymSwapOut = async ({
       protocolConfig,
     },
     asset,
-    amount
+    satAmount
   );
-
   if (!assetAmountInfo) throw new Error('cannot get assetAmount');
 
   const valid = await isNymSwapValid({
@@ -167,18 +196,41 @@ export const doNymSwapOut = async ({
     asset,
     assetDecimals,
     receiver: walletClient.account.address,
-    satAmount: amount,
+    satAmount,
     assetAmount: assetAmountInfo.assetAmount,
   });
 
   if (!valid) throw new Error('invalid swap');
+
+  // check asset allowance
+  const satAllowance = await getErc20Allowance(
+    {
+      publicClient,
+      tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
+    },
+    walletClient.account.address,
+    protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS
+  );
+  if (satAllowance < satAmount) {
+    const allowanceAmt = satAmount - satAllowance;
+    const approveCollHash = await approveErc20(
+      {
+        publicClient,
+        walletClient,
+        tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
+      },
+      protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS,
+      allowanceAmt
+    );
+    await waitTxReceipt({ publicClient }, approveCollHash);
+  }
 
   const hash = await nymScheduleSwapOut({
     publicClient,
     walletClient,
     protocolConfig,
     asset,
-    amount,
+    satAmount,
   });
 
   return hash;

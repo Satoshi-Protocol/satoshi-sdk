@@ -6,7 +6,7 @@ import { getDebtTokenDailyMintCapRemain } from '../nym/getDebtTokenDailyMintCapR
 import { getDebtTokenMinted } from '../nym/getDebtTokenMinted';
 import { getNymPendingWithdrawInfo } from '../nym/getNymPendingWithdrawInfo';
 import { getPreviewSwapIn, getPreviewSwapOut } from '../nym/getPreviewSwap';
-import { approveErc20, getErc20Allowance } from '../readContracts/erc20';
+import { approveErc20, getErc20Allowance, getErc20Balance } from '../readContracts/erc20';
 import { waitTxReceipt } from '../utils/helper';
 import { nymScheduleSwapOut, nymSwapIn } from '../writeContracts/nym/nexusYieldManager';
 export enum ESwap {
@@ -15,6 +15,7 @@ export enum ESwap {
 }
 
 const MIN_AMOUNT = 1;
+
 export const isNymSwapValid = async ({
   swapStatus,
   publicClient,
@@ -43,18 +44,17 @@ export const isNymSwapValid = async ({
     throw new Error('satAmount is undefined');
   }
 
-  const debtTokenMinted = await getDebtTokenMinted({ publicClient, protocolConfig }, asset);
-
-  const isDebtUnderflow = () => {
+  const getIsDebtUnderflow = async () => {
     if (isSwapIn) return false;
     if (satAmount === 0n) return false;
     const receiveAmount = assetAmount;
+    const debtTokenMinted = await getDebtTokenMinted({ publicClient, protocolConfig }, asset);
     const debtTokenMintedAmount = debtTokenMinted ? debtTokenMinted : 0n;
 
     return !debtTokenMintedAmount || debtTokenMintedAmount < receiveAmount;
   };
 
-  const isValidAmount = () => {
+  const getIsValidAmount = () => {
     const hasInValidInput = assetAmount <= 0n || satAmount <= 0n;
     if (hasInValidInput) return false;
     if (isSwapIn) {
@@ -64,20 +64,51 @@ export const isNymSwapValid = async ({
     }
   };
 
-  const debtTokenDailyMintCapRemain = await getDebtTokenDailyMintCapRemain({ publicClient, protocolConfig }, asset);
-  const isExceedDailyMintCapRemain = () => {
+  const getIsExceedDailyMintCapRemain = async () => {
     if (isSwapOut) return false;
+    const debtTokenDailyMintCapRemain = await getDebtTokenDailyMintCapRemain({ publicClient, protocolConfig }, asset);
     if (!debtTokenDailyMintCapRemain) return false;
     const swapInPreviewSatAmount = satAmount;
 
     return swapInPreviewSatAmount > debtTokenDailyMintCapRemain;
   };
 
-  const pendingWithdraw = await getNymPendingWithdrawInfo({ publicClient, protocolConfig }, [asset], receiver);
-  const isHasPendingWithdraw = pendingWithdraw ? false : pendingWithdraw!.length > 0;
+  const getIsHasPendingWithdraw = async () => {
+    if (isSwapOut) return false;
+    const pendingWithdraw = await getNymPendingWithdrawInfo({ publicClient, protocolConfig }, [asset], receiver);
+    if (!pendingWithdraw) return false;
+    return pendingWithdraw.length > 0;
+  };
 
-  const result = !isDebtUnderflow() && isValidAmount() && !isExceedDailyMintCapRemain() && !isHasPendingWithdraw;
-  return result;
+  const getIsOutOfBalance = async () => {
+    if (isSwapIn) {
+      const currentAssetBalance = await getErc20Balance(
+        {
+          publicClient,
+          tokenAddr: asset,
+        },
+        receiver
+      );
+      return currentAssetBalance < assetAmount;
+    } else {
+      const currentSatBalance = await getErc20Balance(
+        {
+          publicClient,
+          tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
+        },
+        receiver
+      );
+      return currentSatBalance < satAmount;
+    }
+  };
+
+  const valid =
+    getIsValidAmount() &&
+    !(await getIsDebtUnderflow()) &&
+    !(await getIsExceedDailyMintCapRemain()) &&
+    !(await getIsHasPendingWithdraw()) &&
+    !(await getIsOutOfBalance());
+  return valid;
 };
 
 export const doNymSwapIn = async ({

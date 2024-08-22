@@ -43,12 +43,12 @@ describe('NYM', () => {
   const account = privateKeyToAccount(privateKey as `0x${string}`);
   const publicClient = getPublicClientByConfig(protocolConfig);
   const walletClient = getWalletClientByConfig(protocolConfig, account);
-  const assetInfo = protocolConfig.SWAP_TOKEN_LIST.find(t => t.symbol === 'USDC')!;
+  const assetInfo = protocolConfig.SWAP_TOKEN_LIST.find(t => t.symbol === 'USDT')!;
   const satoshiClient = new SatoshiClient(protocolConfig, walletClient);
   const NYM = satoshiClient.NexusYieldModule;
   describe('swapIn', () => {
     it('doNymSwapIn', async () => {
-      const assetAmount = parseUnits('10', assetInfo.decimals);
+      const assetAmount = parseUnits('1', assetInfo.decimals);
       const satBalanceBefore = await getErc20Balance(
         {
           publicClient,
@@ -61,11 +61,8 @@ describe('NYM', () => {
       expect(satAmountInfo).toBeDefined();
       const expectedSatBalanceReceived = satAmountInfo!.debtTokenToMint;
 
-      const txHash = await NYM.doNymSwapIn(assetInfo, assetAmount);
+      const receipt = await NYM.doNymSwapIn(assetInfo, assetAmount);
 
-      const receipt = await publicClient.waitForTransactionReceipt({
-        hash: txHash,
-      });
       expect(receipt.status).toBe('success');
 
       const satBalanceAfter = await getErc20Balance(
@@ -89,11 +86,8 @@ describe('NYM', () => {
         walletClient.account.address
       );
 
-      const satAmount = parseUnits('10', DEBT_TOKEN_DECIMALS);
-      const txHash = await NYM.doNymSwapOut(assetInfo, satAmount);
-      const receipt = await publicClient.waitForTransactionReceipt({
-        hash: txHash,
-      });
+      const satAmount = parseUnits('1', DEBT_TOKEN_DECIMALS);
+      const receipt = await NYM.doNymSwapOut(assetInfo, satAmount);
 
       const satBalanceAfter = await getErc20Balance(
         {

@@ -1,12 +1,14 @@
 import { defineChain, parseUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-import { getNymPendingWithdrawInfo } from './../src/core/nym/getNymPendingWithdrawInfo';
-import { doNymWithdraw } from './../src/core/operation/doNymWithdraw';
 import { MOCK_ACCOUNT_MAP } from './mock/account.mock';
-import { DEBT_TOKEN_DECIMALS, ProtocolConfigMap, getPublicClientByConfig, getWalletClientByConfig } from '../src';
-import { getPreviewSwapIn } from '../src/core/nym/getPreviewSwap';
-import { doNymSwapIn, doNymSwapOut } from '../src/core/operation/doNymSwap';
+import {
+  DEBT_TOKEN_DECIMALS,
+  ProtocolConfigMap,
+  SatoshiClient,
+  getPublicClientByConfig,
+  getWalletClientByConfig,
+} from '../src';
 import { getErc20Balance } from '../src/core/readContracts/erc20';
 jest.setTimeout(60 * 1000);
 
@@ -42,7 +44,8 @@ describe('NYM', () => {
   const publicClient = getPublicClientByConfig(protocolConfig);
   const walletClient = getWalletClientByConfig(protocolConfig, account);
   const assetInfo = protocolConfig.SWAP_TOKEN_LIST.find(t => t.symbol === 'USDC')!;
-
+  const satoshiClient = new SatoshiClient(protocolConfig, walletClient);
+  const NYM = satoshiClient.NexusYieldModule;
   describe('swapIn', () => {
     it('doNymSwapIn', async () => {
       const assetAmount = parseUnits('10', assetInfo.decimals);
@@ -54,25 +57,11 @@ describe('NYM', () => {
         walletClient.account.address
       );
 
-      const satAmountInfo = await getPreviewSwapIn(
-        {
-          publicClient,
-          protocolConfig,
-        },
-        assetInfo.address,
-        assetAmount
-      );
+      const satAmountInfo = await NYM.getPreviewSwapIn(assetInfo, assetAmount);
       expect(satAmountInfo).toBeDefined();
       const expectedSatBalanceReceived = satAmountInfo!.debtTokenToMint;
 
-      const txHash = await doNymSwapIn({
-        publicClient,
-        walletClient,
-        protocolConfig,
-        asset: assetInfo.address,
-        assetAmount,
-        assetDecimals: assetInfo.decimals,
-      });
+      const txHash = await NYM.doNymSwapIn(assetInfo, assetAmount);
 
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
@@ -101,14 +90,7 @@ describe('NYM', () => {
       );
 
       const satAmount = parseUnits('10', DEBT_TOKEN_DECIMALS);
-      const txHash = await doNymSwapOut({
-        publicClient,
-        walletClient,
-        protocolConfig,
-        asset: assetInfo.address,
-        assetDecimals: assetInfo.decimals,
-        satAmount,
-      });
+      const txHash = await NYM.doNymSwapOut(assetInfo, satAmount);
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
@@ -126,14 +108,7 @@ describe('NYM', () => {
     });
 
     it('doNymWithdraw', async () => {
-      const pendingInfos = await getNymPendingWithdrawInfo(
-        {
-          publicClient,
-          protocolConfig,
-        },
-        [assetInfo.address],
-        walletClient.account.address
-      );
+      const pendingInfos = await NYM.getNymPendingWithdrawInfo([assetInfo]);
       expect(pendingInfos).toBeDefined();
       expect(pendingInfos!.length).toBe(1);
       const pendingInfo = pendingInfos![0];
@@ -160,12 +135,7 @@ describe('NYM', () => {
         walletClient.account.address
       );
 
-      const txHash = await doNymWithdraw({
-        publicClient,
-        walletClient,
-        protocolConfig,
-        asset: assetInfo.address,
-      });
+      const txHash = await NYM.doNymWithdraw(assetInfo);
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });

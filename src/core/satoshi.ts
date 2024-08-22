@@ -4,6 +4,7 @@ import { SatoshiStabilityPool } from './satoshi-sp';
 import { SatoshiTroveManager } from './satoshi-trove';
 import { getPublicClientByConfig } from '../network';
 import { ProtocolConfig } from '../types';
+import { SatoshiNexusYieldModule } from './satoshi-nym';
 
 export class SatoshiClient {
   public readonly walletClient: WalletClient;
@@ -11,6 +12,7 @@ export class SatoshiClient {
   public readonly publicClient: PublicClient;
   public readonly StabilityPool: SatoshiStabilityPool;
   public readonly TroveManager: SatoshiTroveManager;
+  public readonly NexusYieldModule: SatoshiNexusYieldModule;
 
   constructor(protocolConfig: ProtocolConfig, walletClient: WalletClient) {
     this.protocolConfig = protocolConfig;
@@ -24,6 +26,12 @@ export class SatoshiClient {
     });
 
     this.TroveManager = new SatoshiTroveManager({
+      protocolConfig,
+      publicClient: this.publicClient,
+      walletClient: this.walletClient,
+    });
+
+    this.NexusYieldModule = new SatoshiNexusYieldModule({
       protocolConfig,
       publicClient: this.publicClient,
       walletClient: this.walletClient,

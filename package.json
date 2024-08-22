@@ -1,7 +1,7 @@
 {
   "name": "satoshi-sdk",
   "version": "0.0.4",
-  "description": "Satoshi Protocol SDK",
+  "description": "Satoshi Protocol SDK, a comprehensive toolkit for developers to integrate and interact with the Satoshi Protocol, a DeFi platform on the blockchain.",
   "main": "./lib/index.js",
   "files": [
     "lib/**/*",
@@ -11,8 +11,9 @@
     "lint": "eslint ./src/ ./test/ --fix",
     "build": "tsc --project tsconfig.build.json",
     "test": "jest --coverage",
-    "fork:bevm": "anvil --port 8545 --fork-url https://bevm.rpc-satoshiprotocol.org",
+    "fork:bevm": "anvil --port 8545 --fork-url https://rpc-mainnet-1.bevm.io/",
     "fork:bitlayer": "anvil --port 8546 --fork-url https://rpc.bitlayer.org",
+    "fork:bob": "anvil --fork-url https://rpc.gobob.xyz",
     "clean": "rm -rf ./lib/",
     "cm": "cz",
     "prepare": "husky install",
@@ -34,20 +35,16 @@
     "node": ">=18.0"
   },
   "keywords": [
-    "boilerplate",
-    "template",
+    "satoshi-protocol",
+    "satoshi-sdk",
+    "viem",
     "typescript",
-    "vscode",
-    "jest",
-    "husky",
-    "commitizen",
-    "semantic-release",
-    "codecov"
+    "jest"
   ],
   "bugs": {
     "url": "https://github.com/Satoshi-Protocol/satoshi-sdk/issues"
   },
-  "homepage": "https://github.com/Satoshi-Protocol/satoshi-sdk#readme",
+  "homepage": "https://docs.satoshiprotocol.org/sdk/introduction",
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
@@ -56,15 +53,16 @@
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",
     "@types/jest": "^27.5.2",
     "@types/node": "^12.20.11",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
     "concurrently": "^8.2.2",
     "conventional-changelog-conventionalcommits": "^5.0.0",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-node": "^11.1.0",
-    "@typescript-eslint/eslint-plugin": "^7.14.1",
-    "@typescript-eslint/parser": "^7.14.1",
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
     "jest": "^29.7.0",

@@ -1,6 +1,6 @@
 import { parseUnits } from 'viem';
 
-import { bevm_mainnet, bitlayer_mainnet } from './chain.config';
+import { bevm_mainnet, bitlayer_mainnet, bob_mainnet } from './chain.config';
 import { BEVM_ABI, BITLAYER_ABI } from '../abi';
 import { ChainNameEnum, ProtocolConfig } from '../types/config.type';
 
@@ -94,6 +94,7 @@ const BEVM_MAINNET: ProtocolConfig = {
       decimals: 18,
     },
   ],
+  SWAP_TOKEN_LIST: [],
 };
 
 const BITLAYER_MAINNET: ProtocolConfig = {
@@ -158,9 +159,117 @@ const BITLAYER_MAINNET: ProtocolConfig = {
       decimals: 18,
     },
   ],
+  SWAP_TOKEN_LIST: [
+    {
+      symbol: 'USDT',
+      address: '0xfe9f969faf8Ad72a83b761138bF25dE87eFF9DD2',
+      decimals: 6,
+    },
+    {
+      symbol: 'USDC',
+      address: '0x9827431e8b77E87C9894BD50B055D6BE56bE0030',
+      decimals: 6,
+    },
+  ],
+};
+
+const BOB_MAINNET: ProtocolConfig = {
+  CHAIN_NAME: ChainNameEnum.BOB_MAINNET,
+  CHAIN: bob_mainnet,
+  BOOTSTRAP_END_TIMESTAMP: 1718561110,
+  ABI: BITLAYER_ABI,
+  MIN_BORROWING_AMOUNT: 100, // 100 debt token
+  GAS_COMPENSATION: 10, // 10 debt token
+  MIN_NET_DEBT: 110, // 100 MIN_BORROWING_AMOUNT + 10 GAS_COMPENSATION
+  PROTOCOL_CONTRACT_ADDRESSES: {
+    BORROWER_OPERATIONS_PROXY_ADDRESS: '0x5c1f44E8deD90B0efE155CbEe47f9D0Bcf0B17E8' as `0x${string}`,
+    PRICE_FEED_AGGREGATOR_PROXY_ADDRESS: '0x665126290A2FE0E77277E07eaC59fd760662a1d6' as `0x${string}`,
+    MULTI_COLLATERAL_HINT_HELPER_PROXY_ADDRESS: '0xE651B5A79059571c4ef63768bDf8b612F03F8d20' as `0x${string}`,
+    SATOSHI_PERIPHERY_ADDRESS: '0x4a54D62d212BA989Fff63641C055efD9e57fAfd2' as `0x${string}`,
+    DEBT_TOKEN_ADDRESS: '0x78Fea795cBFcC5fFD6Fb5B845a4f53d25C283bDB' as `0x${string}`,
+    STABILITY_POOL_PROXY_ADDRESS: '0xCF444925ACE7653343cf3510fE99591395ae360B' as `0x${string}`,
+    MULTI_TROVE_GETTER_ADDRESS: '0xf2E11B71c19B5CE97faa1646aE9058e513cfb50c' as `0x${string}`,
+    OSHI_TOKEN_ADDRESS: '0xB18f1D0202f38BD4aA3c1A5Aa2fC8823aE4786b4' as `0x${string}`,
+    REWARD_MANAGER_ADDRESS: '0x1E4DC3B9963365760e2048AD05eE6f11Dc287c0B' as `0x${string}`,
+    NEXUS_YIELD_MANAGER_ADDRESS: '0x7253493c3259137431a120752e410b38d0c715C2' as `0x${string}`,
+  },
+  COLLATERALS: [
+    {
+      NAME: 'WETH',
+      DESCRIPTION: 'Bob Wrapped Ether',
+      ADDRESS: '0x4200000000000000000000000000000000000006' as `0x${string}`,
+      DECIMALS: 18,
+      TROVE_MANAGER_BEACON_PROXY_ADDRESS: '0xc50D117C21054455aE9602237d3d17ca5Fa91288' as `0x${string}`,
+      SORTED_TROVE_BEACON_PROXY_ADDRESS: '0xa4FA738DEF9E3C5Ee3C90Ef39A405EDf682981E1' as `0x${string}`,
+      MIN_CR: 1.1, // 110%
+      ANNUAL_INTEREST_RATE: 0, // 0%
+      IS_NATIVE: true,
+      DISPLAY_NAME: 'ETH',
+    },
+    {
+      NAME: 'WBTC',
+      DESCRIPTION: 'Bob Wrapped BTC',
+      ADDRESS: '0x03C7054BCB39f7b2e5B2c7AcB37583e32D70Cfa3' as `0x${string}`,
+      DECIMALS: 8,
+      TROVE_MANAGER_BEACON_PROXY_ADDRESS: '0xBDFedF992128CbF10974DC935976116e10665Cc9' as `0x${string}`,
+      SORTED_TROVE_BEACON_PROXY_ADDRESS: '0x1085C347F4E4ABd95C087cdB5b8ca5160f68C55c' as `0x${string}`,
+      MIN_CR: 1.1, // 110%
+      ANNUAL_INTEREST_RATE: 0, // 0%
+      IS_NATIVE: false,
+      DISPLAY_NAME: 'WBTC',
+    },
+    {
+      NAME: 'tBTC',
+      DESCRIPTION: 'Threshold tBTC',
+      ADDRESS: '0xbba2ef945d523c4e2608c9e1214c2cc64d4fc2e2' as `0x${string}`,
+      DECIMALS: 18,
+      TROVE_MANAGER_BEACON_PROXY_ADDRESS: '0x8FAE9D3dBeE1c66b84E90df21A1DbdBab9262843' as `0x${string}`,
+      SORTED_TROVE_BEACON_PROXY_ADDRESS: '0x126F323Db675939BB114A53D8FFb454860D55fd6' as `0x${string}`,
+      MIN_CR: 1.1, // 110%
+      ANNUAL_INTEREST_RATE: 0, // 0%
+      IS_NATIVE: false,
+      DISPLAY_NAME: 'tBTC',
+    },
+  ],
+  TOKEN_LIST: [
+    {
+      symbol: 'WETH',
+      address: '0x4200000000000000000000000000000000000006' as `0x${string}`,
+      decimals: 18,
+    },
+    {
+      symbol: 'WBTC',
+      address: '0x03C7054BCB39f7b2e5B2c7AcB37583e32D70Cfa3' as `0x${string}`,
+      decimals: 8,
+    },
+    {
+      symbol: 'tBTC',
+      address: '0xbba2ef945d523c4e2608c9e1214c2cc64d4fc2e2' as `0x${string}`,
+      decimals: 18,
+    },
+    {
+      symbol: 'SAT',
+      address: '0x78Fea795cBFcC5fFD6Fb5B845a4f53d25C283bDB' as `0x${string}`,
+      decimals: 18,
+    },
+  ],
+  SWAP_TOKEN_LIST: [
+    {
+      symbol: 'USDC',
+      address: '0xe75D0fB2C24A55cA1e3F96781a2bCC7bdba058F0' as `0x${string}`,
+      decimals: 6,
+    },
+    {
+      symbol: 'USDT',
+      address: '0x05D032ac25d322df992303dCa074EE7392C117b9' as `0x${string}`,
+      decimals: 6,
+    },
+  ],
+  IS_SWAP_ENABLED: true,
 };
 
 export const ProtocolConfigMap = {
   BEVM_MAINNET,
   BITLAYER_MAINNET,
+  BOB_MAINNET,
 };

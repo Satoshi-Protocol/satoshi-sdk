@@ -4,6 +4,7 @@ export enum ChainNameEnum {
   BEVM_MAINNET = 'BEVM_MAINNET',
   BITLAYER_MAINNET = 'BITLAYER_MAINNET',
   CORE_TESTNET = 'CORE_TESTNET',
+  BOB_MAINNET = 'BOB_MAINNET',
   BOB_TESTNET = 'BOB_TESTNET',
   BIT_LAYER_TESTNET = 'BIT_LAYER_TESTNET',
   B2_TESTNET = 'B2_TESTNET',
@@ -44,6 +45,7 @@ export type SatoshiABIConfig = {
   SORTED_TROVES: any;
   STABILITY_POOL: any;
   TROVE_MANAGER: any;
+  NexusYieldManager: any;
 };
 
 export type ProtocolConfig = {
@@ -78,8 +80,11 @@ export type ProtocolConfig = {
     OSHI_TOKEN_ADDRESS: `0x${string}`;
     REWARD_MANAGER_ADDRESS: `0x${string}`;
     REFERRAL_MANAGER_ADDRESS?: `0x${string}`;
+    NEXUS_YIELD_MANAGER_ADDRESS?: `0x${string}`;
   };
   COLLATERALS: CollateralConfig[];
   TOKEN_LIST: Token[];
+  SWAP_TOKEN_LIST: Token[];
+  IS_SWAP_ENABLED?: boolean;
   ORACLE_PYTH_ADDRESS?: `0x${string}`;
 };

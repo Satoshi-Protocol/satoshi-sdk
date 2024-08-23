@@ -1,7 +1,7 @@
 import { parseUnits } from 'viem';
 
 import { bevm_mainnet, bitlayer_mainnet, bob_mainnet } from './chain.config';
-import { BEVM_ABI, BITLAYER_ABI } from '../abi';
+import { BEVM_ABI, BITLAYER_ABI, BOB_ABI } from '../abi';
 import { ChainNameEnum, ProtocolConfig } from '../types/config.type';
 
 export const SATO_API_URL = 'https://api.satoshiprotocol.org';
@@ -178,7 +178,7 @@ const BOB_MAINNET: ProtocolConfig = {
   CHAIN_NAME: ChainNameEnum.BOB_MAINNET,
   CHAIN: bob_mainnet,
   BOOTSTRAP_END_TIMESTAMP: 1718561110,
-  ABI: BITLAYER_ABI,
+  ABI: BOB_ABI,
   MIN_BORROWING_AMOUNT: 100, // 100 debt token
   GAS_COMPENSATION: 10, // 10 debt token
   MIN_NET_DEBT: 110, // 100 MIN_BORROWING_AMOUNT + 10 GAS_COMPENSATION

@@ -16,7 +16,7 @@ export const getDebtTokenDailyMintCapRemain = async (
   if (!protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS) return undefined;
   const dailyMintCapRemain = (await publicClient.readContract({
     address: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS,
-    abi: protocolConfig.ABI.NexusYieldManager,
+    abi: protocolConfig.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'debtTokenDailyMintCapRemain',
     args: [asset],
   })) as bigint;

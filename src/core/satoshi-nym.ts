@@ -39,7 +39,7 @@ export class SatoshiNexusYieldModule {
    * @param assets swap out assets address
    * @returns 
    */
-  async getNymPendingWithdrawInfo(assets: Token[]) {
+  async getNymPendingWithdrawInfos(assets: Token[]) {
     validateOrThrow(!!this.walletClient.account, 'walletClient account is required');
     
     const _assets = assets.map(asset => this.getAssetInfo(asset.address)!.address);

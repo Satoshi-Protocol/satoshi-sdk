@@ -15,12 +15,13 @@ export const getPreviewSwapIn = async (
 ) => {
   if (!asset) return undefined;
   if (!amount) return undefined;
-  if (!protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS) return undefined;
 
-  const nymAddress = protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS;
+  const nymAddress = protocolConfig.PROTOCOL_CONTRACT_ADDRESSES?.NEXUS_YIELD_MANAGER_ADDRESS;
+  if (!nymAddress) return undefined;
+
   const [debtTokenToMintAmt, feeAmt] = (await publicClient.readContract({
     address: nymAddress,
-    abi: protocolConfig.ABI.NexusYieldManager,
+    abi: protocolConfig.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'previewSwapIn',
     args: [asset, amount],
   })) as [bigint, bigint];
@@ -49,7 +50,7 @@ export const getPreviewSwapOut = async (
 
   const [assetAmount, feeAmt] = (await publicClient.readContract({
     address: nymAddress,
-    abi: protocolConfig.ABI.NexusYieldManager,
+    abi: protocolConfig.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'previewSwapOut',
     args: [asset, amount],
   })) as [bigint, bigint];

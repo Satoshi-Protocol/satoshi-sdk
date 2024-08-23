@@ -3,7 +3,7 @@ import { parseUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
 import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
-import { bobPublicClient, MOCK_BOB_MAINNET } from '../mock';
+import { MOCK_BOB_MAINNET } from '../mock';
 import {
   DEBT_TOKEN_DECIMALS,
   SatoshiClient,
@@ -15,7 +15,7 @@ import { getErc20Balance } from '../../src/core/readContracts/erc20';
 jest.setTimeout(60 * 1000);
 
 const protocolConfig = MOCK_BOB_MAINNET;
-const ASSET_SYMBOL = 'USDC';
+const ASSET_SYMBOL = 'USDT';
 
 describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
   const privateKey = MOCK_ACCOUNT_MAP.fork_account.priv;
@@ -27,7 +27,7 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
   const NYM = satoshiClient.NexusYieldModule;
   const asset = (NYM.getAssetList()).find(t => t.symbol === ASSET_SYMBOL)!;
 
-  it(`swap in 10 ${ASSET_SYMBOL} should be success`, async () => {
+  it(`swap in 1 ${ASSET_SYMBOL} should be success`, async () => {
     const assetAmount = parseUnits('1', asset.decimals);
     const satBalanceBefore = await getErc20Balance(
       {
@@ -80,7 +80,7 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
   });
 
   it('swap out withdraw should be success', async () => {
-    const pendingInfos = await NYM.getNymPendingWithdrawInfo([asset]);
+    const pendingInfos = await NYM.getNymPendingWithdrawInfos([asset]);
     expect(pendingInfos).toBeDefined();
     expect(pendingInfos!.length).toBe(1);
     const pendingInfo = pendingInfos![0];

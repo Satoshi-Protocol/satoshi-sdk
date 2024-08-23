@@ -89,7 +89,7 @@ export const BEVM_ABI = {
   SORTED_TROVES: bevm_sortedTrovesABI.abi,
   STABILITY_POOL: bevm_stabilityPoolABI.abi,
   TROVE_MANAGER: bevm_troveManagerABI.abi,
-  NexusYieldManager: bevm_NexusYieldManagerABI.abi,
+  NEXUS_YIELD_MANAGER: bevm_NexusYieldManagerABI.abi,
 };
 
 export const BITLAYER_ABI: ABIConfig = {
@@ -134,7 +134,7 @@ export const CORE_ABI = {
   SORTED_TROVES: core_sortedTrovesABI.abi,
   STABILITY_POOL: core_stabilityPoolABI.abi,
   TROVE_MANAGER: core_troveManagerABI.abi,
-  NexusYieldManager: core_NexusYieldManagerABI.abi,
+  NEXUS_YIELD_MANAGER: core_NexusYieldManagerABI.abi,
 };
 
 export type ABIConfig = {
@@ -149,7 +149,7 @@ export type ABIConfig = {
   SORTED_TROVES: any;
   STABILITY_POOL: any;
   TROVE_MANAGER: any;
-  NEXUS_YIELD_MANAGER: any;
+  NEXUS_YIELD_MANAGER?: any;
 };
 
 export const SatoshiABIConfigMap = {

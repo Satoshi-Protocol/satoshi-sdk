@@ -218,9 +218,11 @@ export const checkNymSwapIsValid = async ({
   const checkPendingWithdrawInfos = async () => {
     if (isSwapIn) throw new Error('This function is only for swap in');
 
-    const pendingWithdraw = await getNymPendingWithdrawInfo({ publicClient, protocolConfig }, [asset], receiver);
-    if (!pendingWithdraw) throw new Error('pendingWithdraw is undefined');
-    if (pendingWithdraw.length > 0) throw new Error('There are pending withdraws');
+    const pendingWithdraw = await getNymPendingWithdrawInfo({ publicClient, protocolConfig }, [asset], receiver);    
+    const hasPendingWithdraw = pendingWithdraw && pendingWithdraw.find(
+      p => p.scheduledWithdrawalAmount && p.scheduledWithdrawalAmount > 0n
+    );
+    if (hasPendingWithdraw) throw new Error('There are pending withdraws');
 
     return;
   };

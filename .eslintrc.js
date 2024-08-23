@@ -98,5 +98,6 @@ module.exports = {
     'no-unused-vars': ['warn', { vars: 'all', args: 'none', ignoreRestSiblings: false }],
     'no-unused-expressions': ['error', { allowShortCircuit: true, allowTernary: true }],
     'no-duplicate-imports': ['error', { includeExports: true }],
+    '@typescript-eslint/no-unsafe-member-access': 'warn'
   },
 };

@@ -1,7 +1,7 @@
 import { parseUnits } from 'viem';
 
 import { bevm_mainnet, bitlayer_mainnet, bob_mainnet } from './chain.config';
-import { BEVM_ABI, BITLAYER_ABI } from '../abi';
+import { BEVM_ABI, BITLAYER_ABI, BOB_ABI } from '../abi';
 import { ChainNameEnum, ProtocolConfig } from '../types/config.type';
 
 export const SATO_API_URL = 'https://api.satoshiprotocol.org';
@@ -115,6 +115,7 @@ const BITLAYER_MAINNET: ProtocolConfig = {
     MULTI_TROVE_GETTER_ADDRESS: '0x07f69b1Ed174AF500B23becdEDc6Cbe7d47c4E73' as `0x${string}`,
     OSHI_TOKEN_ADDRESS: '0xF0225d5b6E5d3987499B52B3A95A3afB3D8D1263' as `0x${string}`,
     REWARD_MANAGER_ADDRESS: '0xfc8ab0e486F17c78Eaf59A416168d0F89D9373eD' as `0x${string}`,
+    NEXUS_YIELD_MANAGER_ADDRESS: '0xC562321a494290bE5FeDF9092cee35DE6f884D50' as `0x${string}`,
   },
   COLLATERALS: [
     {
@@ -177,7 +178,7 @@ const BOB_MAINNET: ProtocolConfig = {
   CHAIN_NAME: ChainNameEnum.BOB_MAINNET,
   CHAIN: bob_mainnet,
   BOOTSTRAP_END_TIMESTAMP: 1718561110,
-  ABI: BITLAYER_ABI,
+  ABI: BOB_ABI,
   MIN_BORROWING_AMOUNT: 100, // 100 debt token
   GAS_COMPENSATION: 10, // 10 debt token
   MIN_NET_DEBT: 110, // 100 MIN_BORROWING_AMOUNT + 10 GAS_COMPENSATION

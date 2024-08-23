@@ -8,11 +8,12 @@
     "README.md"
   ],
   "scripts": {
-    "lint": "eslint ./src/ --fix",
+    "lint": "eslint ./src/ ./test/ --fix",
     "build": "tsc --project tsconfig.build.json",
     "test": "jest --coverage",
     "fork:bevm": "anvil --port 8545 --fork-url https://rpc-mainnet-1.bevm.io/",
-    "fork:bob": "anvil --fork-url https://rpc.gobob.xyz",
+    "fork:bitlayer": "anvil --port 8546 --fork-url https://rpc.bitlayer.org",
+    "fork:bob": "anvil --port 8547 --fork-url https://rpc.gobob.xyz",
     "clean": "rm -rf ./lib/",
     "cm": "cz",
     "prepare": "husky install",

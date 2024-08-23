@@ -25,18 +25,18 @@ export const getNymPendingWithdrawInfo = async (
   try {
     const [scheduledWithdrawalAmounts, withdrawalTimes] = (await publicClient.readContract({
       address: nymAddress,
-      abi: protocolConfig.ABI.NexusYieldManager,
+      abi: protocolConfig.ABI.NEXUS_YIELD_MANAGER,
       functionName: 'pendingWithdrawals',
       args: [assets, receiver],
     })) as [bigint[], bigint[]];
 
     return assets.map((asset, index) => ({
       asset,
-      withdrawalTime: withdrawalTimes[index],
-      scheduledWithdrawalAmount: scheduledWithdrawalAmounts[index],
+      withdrawalTime: withdrawalTimes?.[index],
+      scheduledWithdrawalAmount: scheduledWithdrawalAmounts?.[index],
     }));
   } catch (error) {
-    console.error('getNymMultiplePendingWithdrawInfo', error);
+    console.error('getNymPendingWithdrawInfo: ', error);
     console.log({
       error,
     });

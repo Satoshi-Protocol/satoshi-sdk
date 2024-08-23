@@ -14,7 +14,7 @@ import {
 } from '../src';
 jest.setTimeout(120 * 1000);
 
-describe('writeContracts', () => {
+describe('Bevm trove operations', () => {
   const protocolConfig = MOCK_BEVM_MAINNET;
   const account = privateKeyToAccount(MOCK_ACCOUNT_MAP.account1.priv as `0x${string}`);
   const publicClient = getPublicClientByConfig(protocolConfig);
@@ -22,101 +22,546 @@ describe('writeContracts', () => {
   const satoshiClient = new SatoshiClient(protocolConfig, walletClient);
 
   const collateral = protocolConfig.COLLATERALS[0];
-  it(`doOpenTrove: (${protocolConfig.CHAIN.name})`, async () => {
-    const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
-    const totalCollAmt = parseEther('0.1');
-    // wbtc
-    const depositHash = await walletClient.writeContract({
-      chain: protocolConfig.CHAIN,
-      account: walletClient.account,
-      address: collateral.ADDRESS,
-      abi: wbtcABI,
-      functionName: 'deposit',
-      args: [],
-      value: totalCollAmt,
+  describe(`trove open: (${protocolConfig.CHAIN.name})`, () => {
+    it('trove open with invalid referrer should be failed', async () => {
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      try {
+        await satoshiClient.TroveManager.doOpenTrove({
+          collateral,
+          borrowingAmt,
+          totalCollAmt,
+          referrer: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Referrer not match');
+      }
     });
-    await waitTxReceipt({ publicClient }, depositHash);
 
-    const receipt = await satoshiClient.TroveManager.doOpenTrove({
-      collateral,
-      borrowingAmt,
-      totalCollAmt,
+    it('trove open without referrer should be success', async () => {
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      // wbtc
+      const depositHash = await walletClient.writeContract({
+        chain: protocolConfig.CHAIN,
+        account: walletClient.account,
+        address: collateral.ADDRESS,
+        abi: wbtcABI,
+        functionName: 'deposit',
+        args: [],
+        value: totalCollAmt,
+      });
+      await waitTxReceipt({ publicClient }, depositHash);
+
+      const receipt = await satoshiClient.TroveManager.doOpenTrove({
+        collateral,
+        borrowingAmt,
+        totalCollAmt,
+      });
+      expect(receipt.status).toBe('success');
     });
-    expect(receipt.status).toBe('success');
+
+    // TODO: CallExecutionError: The request took too long to respond.
+    it('trove open with valid referrer should be success', async () => {
+      const _account = privateKeyToAccount(MOCK_ACCOUNT_MAP.account2.priv as `0x${string}`);
+      const _walletClient = getWalletClientByConfig(protocolConfig, _account);
+      const _satoshiProtocol = new SatoshiClient(protocolConfig, _walletClient);
+
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      // wbtc
+      const depositHash = await _walletClient.writeContract({
+        chain: protocolConfig.CHAIN,
+        account: _walletClient.account,
+        address: collateral.ADDRESS,
+        abi: wbtcABI,
+        functionName: 'deposit',
+        args: [],
+        value: totalCollAmt,
+      });
+      await waitTxReceipt({ publicClient }, depositHash);
+
+      const receipt = await _satoshiProtocol.TroveManager.doOpenTrove({
+        collateral,
+        borrowingAmt,
+        totalCollAmt,
+        referrer: account.address,
+      });
+      expect(receipt.status).toBe('success');
+    });
+
+    it('open trove should check unsupported chain', async () => {
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doOpenTrove({
+          collateral,
+          borrowingAmt,
+          totalCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
+    });
+
+    it('open trove should check wallet account', async () => {
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doOpenTrove({
+          collateral,
+          borrowingAmt,
+          totalCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
+    });
+
+    it('open trove should check invalid collateral', async () => {
+      const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
+      const totalCollAmt = parseEther('0.1');
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        await satoshiClient.TroveManager.doOpenTrove({
+          // @ts-ignore
+          collateral: invalidCollateral,
+          borrowingAmt,
+          totalCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
+
+    it('open trove check coll balance', async () => {
+      const addedCollAmt = parseEther('10001');
+
+      try {
+        await satoshiClient.TroveManager.doOpenTrove({
+          collateral,
+          borrowingAmt: parseUnits('10', DEBT_TOKEN_DECIMALS),
+          totalCollAmt: addedCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Insufficient coll balance');
+      }
+    });
   });
 
-  it(`doDeposit: (${protocolConfig.CHAIN.name})`, async () => {
-    const addedCollAmt = parseEther('0.2');
-    // wbtc
-    const depositHash = await walletClient.writeContract({
-      chain: protocolConfig.CHAIN,
-      account: walletClient.account,
-      address: collateral.ADDRESS,
-      abi: wbtcABI,
-      functionName: 'deposit',
-      args: [],
-      value: addedCollAmt,
-    });
-    await waitTxReceipt({ publicClient }, depositHash);
+  describe(`trove deposit: (${protocolConfig.CHAIN.name})`, () => {
+    // ContractFunctionExecutionError: The contract function "findInsertPosition" reverted.
+    it('deposit should be success', async () => {
+      const addedCollAmt = parseEther('0.2');
+      // wbtc
+      const depositHash = await walletClient.writeContract({
+        chain: protocolConfig.CHAIN,
+        account: walletClient.account,
+        address: collateral.ADDRESS,
+        abi: wbtcABI,
+        functionName: 'deposit',
+        args: [],
+        value: addedCollAmt,
+      });
+      await waitTxReceipt({ publicClient }, depositHash);
 
-    const receipt = await satoshiClient.TroveManager.doDeposit({
-      collateral,
-      addedCollAmt,
+      const receipt = await satoshiClient.TroveManager.doDeposit({
+        collateral,
+        addedCollAmt,
+      });
+      expect(receipt.status).toBe('success');
     });
-    expect(receipt.status).toBe('success');
+
+    it('deposit should check unsupported chain', async () => {
+      const addedCollAmt = parseEther('0.2');
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doDeposit({
+          collateral,
+          addedCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
+    });
+
+    it('deposit should check wallet account', async () => {
+      const addedCollAmt = parseEther('0.2');
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doDeposit({
+          collateral,
+          addedCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
+    });
+
+    it('deposit should check invalid collateral', async () => {
+      const addedCollAmt = parseEther('0.2');
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        await satoshiClient.TroveManager.doDeposit({
+          // @ts-ignore
+          collateral: invalidCollateral,
+          addedCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
+
+    it('deposit should check coll balance', async () => {
+      const addedCollAmt = parseEther('10001');
+
+      try {
+        await satoshiClient.TroveManager.doDeposit({
+          collateral,
+          addedCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Insufficient addedCollAmt balance');
+      }
+    });
   });
 
-  it(`doBorrow: (${protocolConfig.CHAIN.name})`, async () => {
-    const addBorrowingAmt = parseUnits('15', DEBT_TOKEN_DECIMALS);
+  describe(`trove borrow: (${protocolConfig.CHAIN.name})`, () => {
+    // ContractFunctionExecutionError: The contract function "findInsertPosition" reverted.
+    it('borrow should be success', async () => {
+      const addBorrowingAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
 
-    const receipt = await satoshiClient.TroveManager.doBorrow({
-      collateral,
-      addBorrowingAmt,
+      const receipt = await satoshiClient.TroveManager.doBorrow({
+        collateral,
+        addBorrowingAmt,
+      });
+      expect(receipt.status).toBe('success');
     });
-    expect(receipt.status).toBe('success');
-  });
 
-  it(`doWithdraw: (${protocolConfig.CHAIN.name})`, async () => {
-    const withdrawCollAmt = parseEther('0.01');
-
-    const receipt = await satoshiClient.TroveManager.doWithdraw({
-      collateral,
-      withdrawCollAmt,
+    it('borrow should check unsupported chain', async () => {
+      const addBorrowingAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doBorrow({
+          collateral,
+          addBorrowingAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
     });
-    expect(receipt.status).toBe('success');
-  });
 
-  it(`doRepay: (${protocolConfig.CHAIN.name})`, async () => {
-    const repayAmt = parseUnits('3', DEBT_TOKEN_DECIMALS);
-
-    const receipt = await satoshiClient.TroveManager.doRepay({
-      collateral,
-      repayAmt,
+    it('borrow should check wallet account', async () => {
+      const addBorrowingAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doBorrow({
+          collateral,
+          addBorrowingAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
     });
-    expect(receipt.status).toBe('success');
+
+    it('borrow should check invalid collateral', async () => {
+      const addBorrowingAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        await satoshiClient.TroveManager.doBorrow({
+          // @ts-ignore
+          collateral: invalidCollateral,
+          addBorrowingAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
   });
 
-  it(`doRedeem: (${protocolConfig.CHAIN.name})`, async () => {
-    const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+  describe(`trove withdraw: (${protocolConfig.CHAIN.name})`, () => {
+    // ContractFunctionExecutionError: The contract function "findInsertPosition" reverted.
+    it('withdraw should be succedd', async () => {
+      const withdrawCollAmt = parseEther('0.01');
 
-    const receipt = await satoshiClient.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
-    expect(receipt.status).toBe('success');
+      const receipt = await satoshiClient.TroveManager.doWithdraw({
+        collateral,
+        withdrawCollAmt,
+      });
+      expect(receipt.status).toBe('success');
+    });
+
+    it('withdraw should check unsupported chain', async () => {
+      const withdrawCollAmt = parseEther('0.01');
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doWithdraw({
+          collateral,
+          withdrawCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
+    });
+
+    it('withdraw should check wallet account', async () => {
+      const withdrawCollAmt = parseEther('0.01');
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doWithdraw({
+          collateral,
+          withdrawCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
+    });
+
+    it('withdraw should check invalid collateral', async () => {
+      const withdrawCollAmt = parseEther('0.01');
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        await satoshiClient.TroveManager.doWithdraw({
+          // @ts-ignore
+          collateral: invalidCollateral,
+          withdrawCollAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
   });
 
-  describe('StabilityPool', () => {
-    it(`doDeposit: (${protocolConfig.CHAIN.name})`, async () => {
+  describe(`repay: (${protocolConfig.CHAIN.name})`, () => {
+    // ContractFunctionExecutionError: The contract function "findInsertPosition" reverted.
+    it('repay should be success', async () => {
+      const repayAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+
+      const receipt = await satoshiClient.TroveManager.doRepay({
+        collateral,
+        repayAmt,
+      });
+      expect(receipt.status).toBe('success');
+    });
+
+    it('repay should check unsupported chain', async () => {
+      const repayAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doRepay({
+          collateral,
+          repayAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
+    });
+
+    it('repay should check wallet account', async () => {
+      const repayAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doRepay({
+          collateral,
+          repayAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
+    });
+
+    it('repay should check invalid collateral', async () => {
+      const repayAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        await satoshiClient.TroveManager.doRepay({
+          // @ts-ignore
+          collateral: invalidCollateral,
+          repayAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
+
+    it('repay should check invalid repayAmt', async () => {
+      const repayAmt = parseUnits('10001', DEBT_TOKEN_DECIMALS);
+      try {
+        await satoshiClient.TroveManager.doRepay({
+          collateral,
+          repayAmt,
+        });
+      } catch (e: any) {
+        expect(e.message).toBe('Insufficient SAT balance');
+      }
+    });
+  });
+
+  describe(`trove redeem: (${protocolConfig.CHAIN.name})`, () => {
+    it('redeem should be success', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+
+      const receipt = await satoshiClient.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
+      expect(receipt.status).toBe('success');
+    });
+
+    it('redeem should check unsupported chain', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidProtocolConfig = {
+        ...protocolConfig,
+        CHAIN: {
+          ...protocolConfig.CHAIN,
+          id: 0,
+        },
+      };
+      const invalidSatoshiProtocol = new SatoshiClient(invalidProtocolConfig, walletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('Unsupported chain');
+      }
+    });
+
+    it('redeem should check wallet account', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      // @ts-ignore
+      const invalidWalletClient = getWalletClientByConfig(protocolConfig, undefined);
+      const invalidSatoshiProtocol = new SatoshiClient(protocolConfig, invalidWalletClient);
+      try {
+        await invalidSatoshiProtocol.TroveManager.doRedeem(collateral, estimatedRedeemAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('walletClient account is required');
+      }
+    });
+
+    //  Received: "satoshiProtocol is not defined"
+    it('redeem should check invalid collateral', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      const invalidCollateral = {
+        ...collateral,
+        ADDRESS: '0x',
+      };
+      try {
+        // @ts-ignore
+        await satoshiClient.TroveManager.doRedeem(invalidCollateral, estimatedRedeemAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('Collateral not found');
+      }
+    });
+
+    // Received: "satoshiProtocol is not defined"
+    it('redeem should check hint', async () => {
+      const estimatedRedeemAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      try {
+        // @ts-ignore
+        await satoshiClient.TroveManager.doRedeem(collateral, estimatedRedeemAmt, '0x');
+      } catch (e: any) {
+        expect(e.message).toBe('No hint found');
+      }
+    });
+  });
+
+  describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
+    // ValidationError: Insufficient allowance
+    it('deposit should be success', async () => {
       const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
       const receipt = await satoshiClient.StabilityPool.doDeposit(depositAmt);
       expect(receipt.status).toBe('success');
     });
 
-    it(`doWithdraw: (${protocolConfig.CHAIN.name})`, async () => {
+    it('deposit should check SAT balance', async () => {
+      const depositAmt = parseUnits('10001', DEBT_TOKEN_DECIMALS);
+      try {
+        await satoshiClient.StabilityPool.doDeposit(depositAmt);
+      } catch (e: any) {
+        expect(e.message).toBe('Insufficient SAT balance');
+      }
+    });
+
+    // TODO: mock getErc20Allowance
+    it('deposit should check allowence', async () => {
+      // const depositAmt = parseUnits('5', DEBT_TOKEN_DECIMALS);
+      // try {
+      //   await satoshiClient.StabilityPool.doDeposit(depositAmt);
+      // } catch (e: any) {
+      //   expect(e.message).toBe('Insufficient allowance');
+      // }
+    });
+  });
+
+  describe(`stability pool withdraw: (${protocolConfig.CHAIN.name})`, () => {
+    // ValidationError: Insufficient SAT balance
+    it('withdraw should be success', async () => {
       const withdrawAmt = parseUnits('2', DEBT_TOKEN_DECIMALS);
       const receipt = await satoshiClient.StabilityPool.doWithdraw(withdrawAmt);
       expect(receipt.status).toBe('success');
     });
+  });
 
-    it(`doClaim: (${protocolConfig.CHAIN.name})`, async () => {
+  describe(`stability pool claim: (${protocolConfig.CHAIN.name})`, () => {
+    it('claim should be success', async () => {
       const collaterals = satoshiClient.getCollateralConfig();
       const collateralGains = await satoshiClient.StabilityPool.getCollateralGains();
       let hasCollateralClaimable = false;

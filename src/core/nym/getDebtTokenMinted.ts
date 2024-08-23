@@ -16,7 +16,7 @@ export const getDebtTokenMinted = async (
   if (!protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS) return undefined;
   const debtTokenMinted = (await publicClient.readContract({
     address: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS,
-    abi: protocolConfig.ABI.NexusYieldManager,
+    abi: protocolConfig.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'debtTokenMinted',
     args: [asset],
   })) as bigint;

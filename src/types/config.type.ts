@@ -45,7 +45,7 @@ export type SatoshiABIConfig = {
   SORTED_TROVES: any;
   STABILITY_POOL: any;
   TROVE_MANAGER: any;
-  NEXUS_YIELD_MANAGER: any;
+  NEXUS_YIELD_MANAGER?: any;
 };
 
 export type ProtocolConfig = {

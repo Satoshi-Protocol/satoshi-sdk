@@ -23,7 +23,7 @@ export const nymSwapIn = async ({
     chain: protocolConfig.CHAIN,
     account: walletClient.account,
     address: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS!,
-    abi: protocolConfig?.ABI.NexusYieldManager,
+    abi: protocolConfig?.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'swapIn',
     args: [asset, receiver, assetAmount],
   });
@@ -50,7 +50,7 @@ export const nymScheduleSwapOut = async ({
     chain: protocolConfig.CHAIN,
     account: walletClient.account,
     address: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS!,
-    abi: protocolConfig?.ABI.NexusYieldManager,
+    abi: protocolConfig?.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'scheduleSwapOut',
     args: [asset, satAmount],
   });
@@ -75,7 +75,7 @@ export const nymWithdraw = async ({
     chain: protocolConfig.CHAIN,
     account: walletClient.account,
     address: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS!,
-    abi: protocolConfig?.ABI.NexusYieldManager,
+    abi: protocolConfig?.ABI.NEXUS_YIELD_MANAGER,
     functionName: 'withdraw',
     args: [asset],
   });

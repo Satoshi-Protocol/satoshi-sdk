@@ -43,12 +43,14 @@ describe('NYM', () => {
   const account = privateKeyToAccount(privateKey as `0x${string}`);
   const publicClient = getPublicClientByConfig(protocolConfig);
   const walletClient = getWalletClientByConfig(protocolConfig, account);
-  const assetInfo = protocolConfig.SWAP_TOKEN_LIST.find(t => t.symbol === 'USDT')!;
   const satoshiClient = new SatoshiClient(protocolConfig, walletClient);
+
   const NYM = satoshiClient.NexusYieldModule;
+  const asset = (NYM.getAssetList()).find(t => t.symbol === 'USDT')!;
+
   describe('swapIn', () => {
     it('doNymSwapIn', async () => {
-      const assetAmount = parseUnits('1', assetInfo.decimals);
+      const assetAmount = parseUnits('1', asset.decimals);
       const satBalanceBefore = await getErc20Balance(
         {
           publicClient,
@@ -57,11 +59,11 @@ describe('NYM', () => {
         walletClient.account.address
       );
 
-      const satAmountInfo = await NYM.getPreviewSwapIn(assetInfo, assetAmount);
+      const satAmountInfo = await NYM.getPreviewSwapIn(asset.address, assetAmount);
       expect(satAmountInfo).toBeDefined();
       const expectedSatBalanceReceived = satAmountInfo!.debtTokenToMint;
 
-      const receipt = await NYM.doNymSwapIn(assetInfo, assetAmount);
+      const receipt = await NYM.doNymSwapIn(asset.address, assetAmount);
 
       expect(receipt.status).toBe('success');
 
@@ -87,7 +89,7 @@ describe('NYM', () => {
       );
 
       const satAmount = parseUnits('1', DEBT_TOKEN_DECIMALS);
-      const receipt = await NYM.doNymSwapOut(assetInfo, satAmount);
+      const receipt = await NYM.doNymSwapOut(asset.address, satAmount);
 
       const satBalanceAfter = await getErc20Balance(
         {
@@ -102,7 +104,7 @@ describe('NYM', () => {
     });
 
     it('doNymWithdraw', async () => {
-      const pendingInfos = await NYM.getNymPendingWithdrawInfo([assetInfo]);
+      const pendingInfos = await NYM.getNymPendingWithdrawInfo([asset]);
       expect(pendingInfos).toBeDefined();
       expect(pendingInfos!.length).toBe(1);
       const pendingInfo = pendingInfos![0];
@@ -124,12 +126,12 @@ describe('NYM', () => {
       const assetBalanceBefore = await getErc20Balance(
         {
           publicClient,
-          tokenAddr: assetInfo.address,
+          tokenAddr: asset.address,
         },
         walletClient.account.address
       );
 
-      const txHash = await NYM.doNymWithdraw(assetInfo);
+      const txHash = await NYM.doNymWithdraw(asset.address);
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
@@ -137,7 +139,7 @@ describe('NYM', () => {
       const assetBalanceAfter = await getErc20Balance(
         {
           publicClient,
-          tokenAddr: assetInfo.address,
+          tokenAddr: asset.address,
         },
         walletClient.account.address
       );

@@ -4,6 +4,7 @@ import { ProtocolConfig } from 'src/types';
 
 import { getNymPendingWithdrawInfo } from '../nym/getNymPendingWithdrawInfo';
 import { nymWithdraw } from '../writeContracts/nym/nexusYieldManager';
+import { waitTxReceipt } from '../utils/helper';
 
 export const doNymWithdraw = async ({
   publicClient,
@@ -15,7 +16,7 @@ export const doNymWithdraw = async ({
   walletClient: WalletClient;
   protocolConfig: ProtocolConfig;
   asset: `0x${string}`;
-}): Promise<`0x${string}`> => {
+}) => {
   if (!walletClient.account) throw new Error('Wallet client account is undefined');
 
   const pendingInfos = await getNymPendingWithdrawInfo(
@@ -45,6 +46,7 @@ export const doNymWithdraw = async ({
     protocolConfig,
     asset,
   });
+  const receipt = await waitTxReceipt({ publicClient }, hash);
 
-  return hash;
+  return receipt;
 };

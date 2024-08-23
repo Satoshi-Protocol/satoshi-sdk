@@ -61,7 +61,7 @@ describe('NYM', () => {
 
       const satAmountInfo = await NYM.getPreviewSwapIn(asset.address, assetAmount);
       expect(satAmountInfo).toBeDefined();
-      const expectedSatBalanceReceived = satAmountInfo!.debtTokenToMint;
+      const expectedSatBalanceReceived = satAmountInfo!.debtTokenToMintAmt;
 
       const receipt = await NYM.doNymSwapIn(asset.address, assetAmount);
 
@@ -131,10 +131,7 @@ describe('NYM', () => {
         walletClient.account.address
       );
 
-      const txHash = await NYM.doNymWithdraw(asset.address);
-      const receipt = await publicClient.waitForTransactionReceipt({
-        hash: txHash,
-      });
+      const receipt = await NYM.doNymWithdraw(asset.address);
 
       const assetBalanceAfter = await getErc20Balance(
         {

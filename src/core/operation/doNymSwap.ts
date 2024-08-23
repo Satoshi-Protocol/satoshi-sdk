@@ -56,7 +56,7 @@ export const doNymSwapIn = async ({
     asset,
     assetDecimals,
     receiver: walletClient.account.address,
-    satAmount: satAmountInfo.debtTokenToMint,
+    satAmount: satAmountInfo.debtTokenToMintAmt,
     assetAmount,
   });
 

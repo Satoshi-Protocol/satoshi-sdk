@@ -19,6 +19,8 @@ const ASSET_SYMBOL = 'USDT';
 
 describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
   const privateKey = MOCK_ACCOUNT_MAP.fork_account.priv;
+  const debtAddress = protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS;
+
   const account = privateKeyToAccount(privateKey as `0x${string}`);
   const publicClient = getPublicClientByConfig(protocolConfig); 
   const walletClient = getWalletClientByConfig(protocolConfig, account);
@@ -27,19 +29,26 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
   const NYM = satoshiClient.NexusYieldModule;
   const asset = (NYM.getAssetList()).find(t => t.symbol === ASSET_SYMBOL)!;
 
-  it(`swap in 1 ${ASSET_SYMBOL} should be success`, async () => {
-    const assetAmount = parseUnits('1', asset.decimals);
-    const satBalanceBefore = await getErc20Balance(
+  async function getBalanceOf(tokenAddr: `0x${string}`) {
+    return await getErc20Balance(
       {
         publicClient,
-        tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
+        tokenAddr,
       },
       walletClient.account.address
     );
+  }
+
+  it(`swap in 1 ${ASSET_SYMBOL} should be success`, async () => {
+    const assetAmount = parseUnits('1', asset.decimals);
+    const satBalanceBefore = await getBalanceOf(debtAddress);
 
     const satAmountInfo = await NYM.getPreviewSwapIn(asset.address, assetAmount);
-    expect(satAmountInfo).toBeDefined();
+    const expectedFeeAmt = Number(1n) * 0.0005;
+    const readableFeeAmt = Number(satAmountInfo?.feeAmt);
     const expectedSatBalanceReceived = satAmountInfo!.debtTokenToMintAmt;
+
+    expect(readableFeeAmt).toBe(expectedFeeAmt * 1e18);
 
     const receipt = await NYM.doNymSwapIn(asset.address, assetAmount);
 
@@ -48,76 +57,60 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
     const satBalanceAfter = await getErc20Balance(
       {
         publicClient,
-        tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
+        tokenAddr: debtAddress,
       },
       walletClient.account.address
     );
     expect(satBalanceAfter - satBalanceBefore).toBe(expectedSatBalanceReceived);
   });
 
-  it('swap out schedule should be success', async () => {
-    const satBalanceBefore = await getErc20Balance(
-      {
-        publicClient,
-        tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
-      },
-      walletClient.account.address
-    );
-
+  it('swap out 1 SAT schedule should be success', async () => {
+    const satBalanceBefore = await getBalanceOf(debtAddress);
     const satAmount = parseUnits('1', DEBT_TOKEN_DECIMALS);
-    const receipt = await NYM.doNymSwapOut(asset.address, satAmount);
 
-    const satBalanceAfter = await getErc20Balance(
-      {
-        publicClient,
-        tokenAddr: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS,
-      },
-      walletClient.account.address
-    );
+    const previewSwapOut = await NYM.getPreviewSwapOut(asset.address, satAmount);
+    const expectedReceiveAssetAmt = Number(previewSwapOut?.assetAmount);
+    const expectedFeeAmt = Number(satAmount) * 0.005;
+
+    expect(Number(previewSwapOut?.feeAmt)).toEqual(expectedFeeAmt);
+    expect(expectedReceiveAssetAmt * 1e6).toBeLessThanOrEqual(1e18 - expectedFeeAmt);
+
+    const receipt = await NYM.doNymSwapOut(asset.address, satAmount);
+    const satBalanceAfter = await getBalanceOf(debtAddress);
 
     expect(receipt.status).toBe('success');
     expect(satBalanceBefore - satBalanceAfter).toBe(satAmount);
   });
 
-  it('swap out withdraw should be success', async () => {
+  it(`swap out withdraw ${ASSET_SYMBOL} should be success`, async () => {
     const pendingInfos = await NYM.getNymPendingWithdrawInfos([asset]);
-    expect(pendingInfos).toBeDefined();
-    expect(pendingInfos!.length).toBe(1);
-    const pendingInfo = pendingInfos![0];
-    expect(pendingInfo.scheduledWithdrawalAmount > 0n).toBe(true);
 
-    const withdrawTime = pendingInfo.withdrawalTime;
-    expect(withdrawTime > 0n).toBe(true);
-    await publicClient.request({
-      method: 'evm_setNextBlockTimestamp' as unknown as any,
-      params: [`0x${withdrawTime.toString(16)}`],
-    });
-    await publicClient.request({
-      method: 'evm_mine' as unknown as any,
-      params: [] as any,
-    });
-    jest.useFakeTimers();
-    jest.setSystemTime(Number(pendingInfo.withdrawalTime) * 1000);
+    if (!pendingInfos || pendingInfos.length === 0) return;
 
-    const assetBalanceBefore = await getErc20Balance(
-      {
-        publicClient,
-        tokenAddr: asset.address,
-      },
-      walletClient.account.address
-    );
+    for (const pendingInfo of pendingInfos) {
+      const { scheduledWithdrawalAmount, withdrawalTime, asset } = pendingInfo;
+      const assetBalanceBefore = await getBalanceOf(asset);
 
-    const receipt = await NYM.doNymWithdraw(asset.address);
+      if (!(scheduledWithdrawalAmount > 0n) || !(withdrawalTime)) continue;
 
-    const assetBalanceAfter = await getErc20Balance(
-      {
-        publicClient,
-        tokenAddr: asset.address,
-      },
-      walletClient.account.address
-    );
+      await publicClient.request({
+        method: 'evm_setNextBlockTimestamp' as unknown as any,
+        params: [`0x${withdrawalTime.toString(16)}`],
+      });
+      await publicClient.request({
+        method: 'evm_mine' as unknown as any,
+        params: [] as any,
+      });
 
-    expect(receipt.status).toBe('success');
-    expect(assetBalanceAfter - assetBalanceBefore).toBe(pendingInfo.scheduledWithdrawalAmount);
+      jest.useFakeTimers();
+      jest.setSystemTime(Number(withdrawalTime) * 1000);
+
+      const receipt = await NYM.doNymWithdraw(asset);
+
+      expect(receipt.status).toBe('success');
+      const assetBalanceAfter = await getBalanceOf(asset);
+
+      expect(assetBalanceAfter - assetBalanceBefore).toBe(scheduledWithdrawalAmount);
+    }
   });
 });

@@ -39,6 +39,52 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
     );
   }
 
+  it('invalid swap amount should throw error', async () => {
+    const assetAmount = parseUnits('0', asset.decimals);
+    await expect(NYM.doNymSwapIn(asset.address, assetAmount)).rejects.toThrow();
+  });
+
+  it('swap amount over balance should throw error', async () => {
+    const assetAmount = parseUnits('100000', asset.decimals);
+    await expect(NYM.doNymSwapIn(asset.address, assetAmount)).rejects.toThrow();
+  });
+
+  it('debt underflow when swap out should throw error', async () => {
+    const satAmount = 100000n;
+    await expect(NYM.doNymSwapOut(asset.address, satAmount)).rejects.toThrow();
+  });
+
+  it('swap in amount above debt daily supply should throw error', async () => {
+    const assetAmount = parseUnits('100000', asset.decimals);
+    await expect(NYM.doNymSwapIn(asset.address, assetAmount)).rejects.toThrow();
+  });
+
+  it('swap out with pending withdraw info should throw error', async () => {
+    const pendingInfos = await NYM.getNymPendingWithdrawInfos([asset]);
+
+    if (!pendingInfos || pendingInfos.length === 0) return;
+
+    for (const pendingInfo of pendingInfos) {
+      const { scheduledWithdrawalAmount, withdrawalTime, asset } = pendingInfo;
+
+      if (!(scheduledWithdrawalAmount > 0n) || !(withdrawalTime)) continue;
+
+      await publicClient.request({
+        method: 'evm_setNextBlockTimestamp' as unknown as any,
+        params: [`0x${withdrawalTime.toString(16)}`],
+      });
+      await publicClient.request({
+        method: 'evm_mine' as unknown as any,
+        params: [] as any,
+      });
+
+      jest.useFakeTimers();
+      jest.setSystemTime(Number(withdrawalTime) * 1000);
+
+      await expect(NYM.doNymWithdraw(asset)).rejects.toThrow();
+    }
+  });
+
   it(`swap in 1 ${ASSET_SYMBOL} should be success`, async () => {
     const assetAmount = parseUnits('1', asset.decimals);
     const satBalanceBefore = await getBalanceOf(debtAddress);

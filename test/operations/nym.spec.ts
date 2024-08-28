@@ -11,6 +11,10 @@ import {
   getWalletClientByConfig
 } from '../../src';
 import { getErc20Balance } from '../../src/core/readContracts/erc20';
+import { getDebtTokenDailyMintCapRemain } from '../../src/core/nym/getDebtTokenDailyMintCapRemain';
+import { getDebtTokenMinted } from '../../src/core/nym/getDebtTokenMinted';
+import { getNymPendingWithdrawInfo } from '../../src/core/nym/getNymPendingWithdrawInfo';
+import { getPreviewSwapIn, getPreviewSwapOut } from '../../src/core/nym/getPreviewSwap';
 
 jest.setTimeout(60 * 1000);
 
@@ -38,6 +42,52 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
       walletClient.account.address
     );
   }
+
+  it('invalid swap amount should throw error', async () => {
+    const assetAmount = parseUnits('0', asset.decimals);
+    await expect(NYM.doNymSwapIn(asset.address, assetAmount)).rejects.toThrow();
+  });
+
+  it('swap amount over balance should throw error', async () => {
+    const assetAmount = parseUnits('100000', asset.decimals);
+    await expect(NYM.doNymSwapIn(asset.address, assetAmount)).rejects.toThrow();
+  });
+
+  it('debt underflow when swap out should throw error', async () => {
+    const satAmount = 100000n;
+    await expect(NYM.doNymSwapOut(asset.address, satAmount)).rejects.toThrow();
+  });
+
+  it('swap in amount above debt daily supply should throw error', async () => {
+    const assetAmount = parseUnits('100000', asset.decimals);
+    await expect(NYM.doNymSwapIn(asset.address, assetAmount)).rejects.toThrow();
+  });
+
+  it('swap out with pending withdraw info should throw error', async () => {
+    const pendingInfos = await NYM.getNymPendingWithdrawInfos([asset]);
+
+    if (!pendingInfos || pendingInfos.length === 0) return;
+
+    for (const pendingInfo of pendingInfos) {
+      const { scheduledWithdrawalAmount, withdrawalTime, asset } = pendingInfo;
+
+      if (!(scheduledWithdrawalAmount > 0n) || !(withdrawalTime)) continue;
+
+      await publicClient.request({
+        method: 'evm_setNextBlockTimestamp' as unknown as any,
+        params: [`0x${withdrawalTime.toString(16)}`],
+      });
+      await publicClient.request({
+        method: 'evm_mine' as unknown as any,
+        params: [] as any,
+      });
+
+      jest.useFakeTimers();
+      jest.setSystemTime(Number(withdrawalTime) * 1000);
+
+      await expect(NYM.doNymWithdraw(asset)).rejects.toThrow();
+    }
+  });
 
   it(`swap in 1 ${ASSET_SYMBOL} should be success`, async () => {
     const assetAmount = parseUnits('1', asset.decimals);
@@ -114,3 +164,197 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
     }
   });
 });
+
+describe('utils function test', () => {
+  describe('getDebtTokenDailyMintCapRemain', () => {
+    it('invalid asset should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '';
+      const dailyMintCapRemain = await getDebtTokenDailyMintCapRemain(
+        {
+          publicClient,
+          protocolConfig,
+        },
+        // @ts-ignore
+        asset
+      );
+      expect(dailyMintCapRemain).toBeUndefined();
+    });
+
+    it('invalid NYM address should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x6b175474e89094c44da98b954eedeac495271d0f';
+      const dailyMintCapRemain = await getDebtTokenDailyMintCapRemain(
+        {
+          publicClient,
+          protocolConfig: {
+            ...protocolConfig,
+            PROTOCOL_CONTRACT_ADDRESSES: {
+              ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
+              // @ts-ignore
+              NEXUS_YIELD_MANAGER_ADDRESS: ''
+            },
+          },
+        },
+        asset
+      );
+      expect(dailyMintCapRemain).toBeUndefined();
+    });
+  });
+  describe('getDebtTokenMinted', () => {
+    it('invalid asset should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '';
+      const debtTokenMinted = await getDebtTokenMinted(
+        {
+          publicClient,
+          protocolConfig,
+        },
+        // @ts-ignore
+        asset
+      );
+      expect(debtTokenMinted).toBeUndefined();
+    });
+    it('invalid NYM address should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x6b175474e89094c44da98b954eedeac495271d0f';
+      const debtTokenMinted = await getDebtTokenMinted(
+        {
+          publicClient,
+          protocolConfig: {
+            ...protocolConfig,
+            PROTOCOL_CONTRACT_ADDRESSES: {
+              ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
+              // @ts-ignore
+              NEXUS_YIELD_MANAGER_ADDRESS: ''
+            },
+          },
+        },
+        asset
+      );
+      expect(debtTokenMinted).toBeUndefined();
+    });
+  });
+  describe('getNymPendingWithdrawInfo', () => {
+    it('invalid asset should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x';
+      const pendingWithdrawInfo = await getNymPendingWithdrawInfo(
+        {
+          publicClient,
+          protocolConfig,
+        },
+        [asset],
+        '0x'
+      );
+      expect(pendingWithdrawInfo).toBeUndefined();
+    });
+    it('invalid NYM address should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x6b175474e89094c44da98b954eedeac495271d0f';
+      const pendingWithdrawInfo = await getNymPendingWithdrawInfo(
+        {
+          publicClient,
+          protocolConfig: {
+            ...protocolConfig,
+            PROTOCOL_CONTRACT_ADDRESSES: {
+              ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
+              NEXUS_YIELD_MANAGER_ADDRESS: '0x'
+            },
+          }
+        },
+        [asset],
+        '0x'
+      );
+      expect(pendingWithdrawInfo).toBeUndefined();
+    });
+  });
+  describe('getPreviewSwapIn', () => {
+    it('invalid asset should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x';
+      const previewSwapIn = await getPreviewSwapIn(
+        {
+          publicClient,
+          protocolConfig,
+        },
+        asset,
+        0n
+      );
+      expect(previewSwapIn).toBeUndefined();
+    });
+    it('invalid NYM address should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x6b175474e89094c44da98b954eedeac495271d0f';
+      const previewSwapIn = await getPreviewSwapIn(
+        {
+          publicClient,
+          protocolConfig: {
+            ...protocolConfig,
+            PROTOCOL_CONTRACT_ADDRESSES: {
+              ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
+              NEXUS_YIELD_MANAGER_ADDRESS: '0x'
+            },
+          }
+        },
+        asset,
+        0n
+      );
+      expect(previewSwapIn).toBeUndefined();
+    });
+  });
+  describe('getPreviewSwapOut', () => {
+    it('invalid asset should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x';
+      const previewSwapOut = await getPreviewSwapOut(
+        {
+          publicClient,
+          protocolConfig,
+        },
+        asset,
+        0n
+      );
+      expect(previewSwapOut).toBeUndefined();
+    });
+    it('invalid NYM address should return undefined', async () => {
+      const protocolConfig = MOCK_BOB_MAINNET;
+      const publicClient = getPublicClientByConfig(protocolConfig);
+
+      const asset = '0x6b175474e89094c44da98b954eedeac495271d0f';
+      const previewSwapOut = await getPreviewSwapOut(
+        {
+          publicClient,
+          protocolConfig: {
+            ...protocolConfig,
+            PROTOCOL_CONTRACT_ADDRESSES: {
+              ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
+              NEXUS_YIELD_MANAGER_ADDRESS: '0x'
+            },
+          }
+        },
+        asset,
+        0n
+      );
+      expect(previewSwapOut).toBeUndefined();
+    });
+  });
+})

@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { Address } from 'viem';
 
+import { ChainNameEnum } from 'src/types';
+
 import { SetReferrer, TroveHintRequestDto, WalletInDto } from './satoshi-api.type';
 import { SATO_API_URL } from '../config';
-import { ChainNameEnum } from 'src/types';
 
 const axiosInstance = axios.create({
   baseURL: SATO_API_URL,

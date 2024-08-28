@@ -3,8 +3,8 @@ import { PublicClient, WalletClient } from 'viem';
 import { ProtocolConfig } from 'src/types';
 
 import { getNymPendingWithdrawInfo } from '../nym/getNymPendingWithdrawInfo';
-import { nymWithdraw } from '../writeContracts/nym/nexusYieldManager';
 import { waitTxReceipt } from '../utils/helper';
+import { nymWithdraw } from '../writeContracts/nym/nexusYieldManager';
 
 export const doNymWithdraw = async ({
   publicClient,

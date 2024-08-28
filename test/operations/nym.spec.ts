@@ -2,19 +2,14 @@
 import { parseUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
-import { MOCK_BOB_MAINNET } from '../mock';
-import {
-  DEBT_TOKEN_DECIMALS,
-  SatoshiClient,
-  getPublicClientByConfig,
-  getWalletClientByConfig
-} from '../../src';
-import { getErc20Balance } from '../../src/core/readContracts/erc20';
+import { DEBT_TOKEN_DECIMALS, SatoshiClient, getPublicClientByConfig, getWalletClientByConfig } from '../../src';
 import { getDebtTokenDailyMintCapRemain } from '../../src/core/nym/getDebtTokenDailyMintCapRemain';
 import { getDebtTokenMinted } from '../../src/core/nym/getDebtTokenMinted';
 import { getNymPendingWithdrawInfo } from '../../src/core/nym/getNymPendingWithdrawInfo';
 import { getPreviewSwapIn, getPreviewSwapOut } from '../../src/core/nym/getPreviewSwap';
+import { getErc20Balance } from '../../src/core/readContracts/erc20';
+import { MOCK_BOB_MAINNET } from '../mock';
+import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
 
 jest.setTimeout(60 * 1000);
 
@@ -26,12 +21,12 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
   const debtAddress = protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.DEBT_TOKEN_ADDRESS;
 
   const account = privateKeyToAccount(privateKey as `0x${string}`);
-  const publicClient = getPublicClientByConfig(protocolConfig); 
+  const publicClient = getPublicClientByConfig(protocolConfig);
   const walletClient = getWalletClientByConfig(protocolConfig, account);
   const satoshiClient = new SatoshiClient(protocolConfig, walletClient);
 
   const NYM = satoshiClient.NexusYieldModule;
-  const asset = (NYM.getAssetList()).find(t => t.symbol === ASSET_SYMBOL)!;
+  const asset = NYM.getAssetList().find(t => t.symbol === ASSET_SYMBOL)!;
 
   async function getBalanceOf(tokenAddr: `0x${string}`) {
     return await getErc20Balance(
@@ -71,7 +66,7 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
     for (const pendingInfo of pendingInfos) {
       const { scheduledWithdrawalAmount, withdrawalTime, asset } = pendingInfo;
 
-      if (!(scheduledWithdrawalAmount > 0n) || !(withdrawalTime)) continue;
+      if (!(scheduledWithdrawalAmount > 0n) || !withdrawalTime) continue;
 
       await publicClient.request({
         method: 'evm_setNextBlockTimestamp' as unknown as any,
@@ -141,7 +136,7 @@ describe(`NYM asset ${ASSET_SYMBOL}: (${protocolConfig.CHAIN.name})`, () => {
       const { scheduledWithdrawalAmount, withdrawalTime, asset } = pendingInfo;
       const assetBalanceBefore = await getBalanceOf(asset);
 
-      if (!(scheduledWithdrawalAmount > 0n) || !(withdrawalTime)) continue;
+      if (!(scheduledWithdrawalAmount > 0n) || !withdrawalTime) continue;
 
       await publicClient.request({
         method: 'evm_setNextBlockTimestamp' as unknown as any,
@@ -196,7 +191,7 @@ describe('utils function test', () => {
             PROTOCOL_CONTRACT_ADDRESSES: {
               ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
               // @ts-ignore
-              NEXUS_YIELD_MANAGER_ADDRESS: ''
+              NEXUS_YIELD_MANAGER_ADDRESS: '',
             },
           },
         },
@@ -234,7 +229,7 @@ describe('utils function test', () => {
             PROTOCOL_CONTRACT_ADDRESSES: {
               ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
               // @ts-ignore
-              NEXUS_YIELD_MANAGER_ADDRESS: ''
+              NEXUS_YIELD_MANAGER_ADDRESS: '',
             },
           },
         },
@@ -271,9 +266,9 @@ describe('utils function test', () => {
             ...protocolConfig,
             PROTOCOL_CONTRACT_ADDRESSES: {
               ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
-              NEXUS_YIELD_MANAGER_ADDRESS: '0x'
+              NEXUS_YIELD_MANAGER_ADDRESS: '0x',
             },
-          }
+          },
         },
         [asset],
         '0x'
@@ -309,9 +304,9 @@ describe('utils function test', () => {
             ...protocolConfig,
             PROTOCOL_CONTRACT_ADDRESSES: {
               ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
-              NEXUS_YIELD_MANAGER_ADDRESS: '0x'
+              NEXUS_YIELD_MANAGER_ADDRESS: '0x',
             },
-          }
+          },
         },
         asset,
         0n
@@ -347,9 +342,9 @@ describe('utils function test', () => {
             ...protocolConfig,
             PROTOCOL_CONTRACT_ADDRESSES: {
               ...protocolConfig.PROTOCOL_CONTRACT_ADDRESSES,
-              NEXUS_YIELD_MANAGER_ADDRESS: '0x'
+              NEXUS_YIELD_MANAGER_ADDRESS: '0x',
             },
-          }
+          },
         },
         asset,
         0n
@@ -357,4 +352,4 @@ describe('utils function test', () => {
       expect(previewSwapOut).toBeUndefined();
     });
   });
-})
+});

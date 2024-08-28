@@ -7,9 +7,9 @@ import { getDebtTokenMinted } from '../nym/getDebtTokenMinted';
 import { getNymPendingWithdrawInfo } from '../nym/getNymPendingWithdrawInfo';
 import { getPreviewSwapIn, getPreviewSwapOut } from '../nym/getPreviewSwap';
 import { getErc20Balance } from '../readContracts/erc20';
+import getErc20AllowanceAndApprove from '../utils/getErc20AllowanceAndApprove';
 import { waitTxReceipt } from '../utils/helper';
 import { nymScheduleSwapOut, nymSwapIn } from '../writeContracts/nym/nexusYieldManager';
-import getErc20AllowanceAndApprove from '../utils/getErc20AllowanceAndApprove';
 
 export enum ESwap {
   SWAPIN = 'SWAPIN', // receive SAT
@@ -66,7 +66,7 @@ export const doNymSwapIn = async ({
     tokenAddr: asset,
     amount: assetAmount,
     owner: walletClient.account.address,
-    spender: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS
+    spender: protocolConfig.PROTOCOL_CONTRACT_ADDRESSES.NEXUS_YIELD_MANAGER_ADDRESS,
   });
 
   const hash = await nymSwapIn({
@@ -97,10 +97,7 @@ export const doNymSwapOut = async ({
   assetDecimals: number;
   satAmount: bigint;
 }) => {
-  const {
-    NEXUS_YIELD_MANAGER_ADDRESS = '',
-    DEBT_TOKEN_ADDRESS = ''
-  } = protocolConfig.PROTOCOL_CONTRACT_ADDRESSES;
+  const { NEXUS_YIELD_MANAGER_ADDRESS = '', DEBT_TOKEN_ADDRESS = '' } = protocolConfig.PROTOCOL_CONTRACT_ADDRESSES;
 
   if (!walletClient.account) throw new Error('Wallet client account is undefined');
   if (!NEXUS_YIELD_MANAGER_ADDRESS) {
@@ -135,7 +132,7 @@ export const doNymSwapOut = async ({
     tokenAddr: DEBT_TOKEN_ADDRESS,
     amount: satAmount,
     owner: walletClient.account.address,
-    spender: NEXUS_YIELD_MANAGER_ADDRESS
+    spender: NEXUS_YIELD_MANAGER_ADDRESS,
   });
 
   const hash = await nymScheduleSwapOut({
@@ -208,9 +205,8 @@ export const checkNymSwapIsValid = async ({
     if (!debtTokenDailyMintCapRemain) throw new Error('debtTokenDailyMintCapRemain is undefined');
 
     const swapInPreviewSatAmount = satAmount;
-    if (swapInPreviewSatAmount > debtTokenDailyMintCapRemain) throw new Error(
-      'Debt token daily mint cap is not enough'
-    );
+    if (swapInPreviewSatAmount > debtTokenDailyMintCapRemain)
+      throw new Error('Debt token daily mint cap is not enough');
 
     return;
   };
@@ -218,10 +214,9 @@ export const checkNymSwapIsValid = async ({
   const checkPendingWithdrawInfos = async () => {
     if (isSwapIn) throw new Error('This function is only for swap in');
 
-    const pendingWithdraw = await getNymPendingWithdrawInfo({ publicClient, protocolConfig }, [asset], receiver);    
-    const hasPendingWithdraw = pendingWithdraw && pendingWithdraw.find(
-      p => p.scheduledWithdrawalAmount && p.scheduledWithdrawalAmount > 0n
-    );
+    const pendingWithdraw = await getNymPendingWithdrawInfo({ publicClient, protocolConfig }, [asset], receiver);
+    const hasPendingWithdraw =
+      pendingWithdraw && pendingWithdraw.find(p => p.scheduledWithdrawalAmount && p.scheduledWithdrawalAmount > 0n);
     if (hasPendingWithdraw) throw new Error('There are pending withdraws');
 
     return;
@@ -236,19 +231,16 @@ export const checkNymSwapIsValid = async ({
 
     if (balance === undefined) throw new Error('balance is undefined');
     if (balance < amount) throw new Error('Insufficient balance');
-    
+
     return;
   };
 
   checkInputAmount();
   await checkBalance();
 
-  isSwapIn && await checkDebtSupplyEnough();
+  isSwapIn && (await checkDebtSupplyEnough());
 
-  !isSwapIn && await Promise.all([
-    checkDebtUnderflow(),
-    checkPendingWithdrawInfos()
-  ]);
+  !isSwapIn && (await Promise.all([checkDebtUnderflow(), checkPendingWithdrawInfos()]));
 
   return;
 };

@@ -37,12 +37,12 @@ export class SatoshiNexusYieldModule {
   /**
    * @description Get pending withdraw infos
    * @param assets swap out assets address
-   * @returns 
+   * @returns
    */
   async getNymPendingWithdrawInfos(assets: Token[]) {
     validateOrThrow(!!this.walletClient.account, 'walletClient account is required');
-    
-    const _assets = assets.map(asset => this.getAssetInfo(asset.address)!.address);
+
+    const _assets = assets.map(asset => this.getAssetInfo(asset.address).address);
 
     return await getNymPendingWithdrawInfo(
       {
@@ -79,7 +79,7 @@ export class SatoshiNexusYieldModule {
    * @description Preview swap out received amount and fee
    * @param asset asset address
    * @param amount debt token amount
-   * @returns 
+   * @returns
    */
   async getPreviewSwapOut(asset: `0x${string}`, amount: bigint) {
     validateOrThrow(!!this.walletClient.account, 'walletClient account is required');
@@ -100,7 +100,7 @@ export class SatoshiNexusYieldModule {
    * @description Swap in asset and receive debt token
    * @param asset asset address
    * @param amount swap in amount
-   * @returns 
+   * @returns
    */
   async doNymSwapIn(asset: `0x${string}`, assetAmount: bigint) {
     validateOrThrow(!!this.walletClient.account, 'walletClient account is required');
@@ -121,7 +121,7 @@ export class SatoshiNexusYieldModule {
    * @description Scheduled swap out asset, the asset will be able to withdraw after the scheduled time
    * @param asset received asset address
    * @param amount swap out debt token amount
-   * @returns 
+   * @returns
    */
   async doNymSwapOut(asset: `0x${string}`, satAmount: bigint) {
     const _asset = this.getAssetInfo(asset);
@@ -139,7 +139,7 @@ export class SatoshiNexusYieldModule {
   /**
    * @description Withdraw swap out asset
    * @param asset swap out asset address
-   * @returns 
+   * @returns
    */
   async doNymWithdraw(asset: `0x${string}`) {
     const _asset = this.getAssetInfo(asset);
@@ -155,14 +155,14 @@ export class SatoshiNexusYieldModule {
   /**
    * @description Get asset info and validate
    * @param asset asset address
-   * @returns 
+   * @returns
    */
   private getAssetInfo(asset: `0x${string}`) {
     const assetList = this.getAssetList();
     const result = assetList.find(t => t.address === asset);
 
     const helperTxt = `Supported assets: ${assetList.map(t => t.symbol).join(', ')}`;
-    if(!result) throw new Error(`Invalid asset, ${helperTxt}`);
+    if (!result) throw new Error(`Invalid asset, ${helperTxt}`);
 
     return result;
   }

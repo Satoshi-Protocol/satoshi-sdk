@@ -2,8 +2,6 @@
 import { parseEther, parseUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-import { MOCK_BEVM_MAINNET } from '../mock';
-import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
 import {
   DEBT_TOKEN_DECIMALS,
   SatoshiClient,
@@ -12,6 +10,8 @@ import {
   waitTxReceipt,
   wbtcABI,
 } from '../../src';
+import { MOCK_BEVM_MAINNET } from '../mock';
+import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
 
 jest.setTimeout(30 * 1000);
 
@@ -30,7 +30,7 @@ describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
     const { debt } = currentPosition;
     if (debt > 0n) return;
 
-    let start = Date.now();
+    const start = Date.now();
     try {
       const borrowingAmt = parseUnits('10', DEBT_TOKEN_DECIMALS);
       const totalCollAmt = parseEther('0.1');
@@ -49,8 +49,8 @@ describe(`stability pool deposit: (${protocolConfig.CHAIN.name})`, () => {
       await satoshiClient.TroveManager.doOpenTrove({
         collateral,
         borrowingAmt,
-        totalCollAmt
-      })
+        totalCollAmt,
+      });
       console.log('doOpenTrove time:', Date.now() - start, 'ms');
     } catch (e) {
       console.error(e);

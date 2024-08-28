@@ -45,5 +45,5 @@ export const MOCK_ACCOUNT_MAP = {
   account10: {
     address: '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720',
     priv: '0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6',
-  }
+  },
 };

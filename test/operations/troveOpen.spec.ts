@@ -2,8 +2,6 @@
 import { parseEther, parseUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-import { MOCK_BEVM_MAINNET } from '../mock';
-import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
 import {
   DEBT_TOKEN_DECIMALS,
   SatoshiClient,
@@ -12,6 +10,8 @@ import {
   waitTxReceipt,
   wbtcABI,
 } from '../../src';
+import { MOCK_BEVM_MAINNET } from '../mock';
+import { MOCK_ACCOUNT_MAP } from '../mock/account.mock';
 
 jest.setTimeout(120 * 1000);
 

@@ -1,10 +1,10 @@
 import { PublicClient, WalletClient } from 'viem';
 
+import { SatoshiNexusYieldModule } from './satoshi-nym';
 import { SatoshiStabilityPool } from './satoshi-sp';
 import { SatoshiTroveManager } from './satoshi-trove';
 import { getPublicClientByConfig } from '../network';
 import { ProtocolConfig } from '../types';
-import { SatoshiNexusYieldModule } from './satoshi-nym';
 
 export class SatoshiClient {
   public readonly walletClient: WalletClient;

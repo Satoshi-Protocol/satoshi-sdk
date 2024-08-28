@@ -1,8 +1,7 @@
 import { PublicClient, WalletClient } from 'viem';
 
-import { approveErc20, getErc20Allowance } from '../readContracts/erc20';
 import { waitTxReceipt } from './helper';
-
+import { approveErc20, getErc20Allowance } from '../readContracts/erc20';
 
 export async function getErc20AllowanceAndApprove({
   walletClient,
@@ -10,7 +9,7 @@ export async function getErc20AllowanceAndApprove({
   tokenAddr,
   amount,
   owner,
-  spender
+  spender,
 }: {
   walletClient: WalletClient;
   publicClient: PublicClient;
@@ -41,6 +40,6 @@ export async function getErc20AllowanceAndApprove({
     await waitTxReceipt({ publicClient }, approveCollHash);
   }
   return;
-};
+}
 
-export default getErc20AllowanceAndApprove
+export default getErc20AllowanceAndApprove;
